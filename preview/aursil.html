@@ -1,0 +1,325 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AurSil App Preview</title>
+<style>
+  :root { --navy:#0B1F3A; --navy2:#16305A; --gold:#F5B82E; --goldd:#C9921A; --silver:#C0C7D1; --bg:#F4F6FA; --muted:#6B7280; --red:#D32F2F; }
+  * { box-sizing:border-box; }
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; gap:28px; flex-wrap:wrap;
+         background:#e3e6ee; font-family:Roboto,"Segoe UI",Arial,sans-serif; padding:20px; }
+  .phone { width:390px; height:800px; background:#111; border-radius:46px; padding:12px; box-shadow:0 24px 60px rgba(0,0,0,.35); flex:none; }
+  .screen { width:100%; height:100%; border-radius:36px; overflow:hidden; position:relative; background:var(--bg); }
+  .page { position:absolute; inset:0; overflow-y:auto; display:none; }
+  .page.active { display:block; animation:fade .25s; }
+  @keyframes fade { from{opacity:0} to{opacity:1} }
+  .brand { font-weight:700; } .brand .a { color:var(--gold); } .brand .s { color:var(--silver); }
+  .tag { color:#AEB8CC; font-size:13px; }
+  /* splash */
+  #splash { background:var(--navy); display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+  #splash.active { display:flex; }
+  #splash svg { width:130px; animation:pop .8s cubic-bezier(.3,1.6,.5,1); }
+  @keyframes pop { from{transform:scale(.5);opacity:0} to{transform:scale(1);opacity:1} }
+  .spinner { width:30px; height:30px; border:3px solid #ffffff22; border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; margin:40px auto 10px; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  /* auth pages */
+  .hdr { background:var(--navy); padding:36px 22px 62px; color:#fff; position:relative; }
+  .hdr.center { text-align:center; }
+  .hdr h1 { margin:0; font-size:24px; } .hdr p { margin:4px 0 0; color:#AEB8CC; font-size:13px; }
+  .back { position:absolute; left:18px; top:30px; font-size:26px; cursor:pointer; }
+  .hdr.withback { padding-left:56px; }
+  .gear { position:absolute; right:20px; top:22px; color:#5E6E8C; cursor:pointer; font-size:20px; }
+  .card { background:#fff; margin:-38px 18px 18px; border-radius:20px; padding:22px; box-shadow:0 6px 18px rgba(0,0,0,.12); position:relative; }
+  .card h2 { margin:0; color:var(--navy); font-size:24px; } .card .sub { color:var(--muted); font-size:14px; margin:4px 0 14px; }
+  label { display:block; font-size:13px; color:var(--muted); margin:12px 0 3px 4px; }
+  .field { display:flex; align-items:center; border:1px solid #D7DCE5; border-radius:12px; height:52px; padding:0 12px; background:#fff; }
+  .field:focus-within { border-color:var(--gold); }
+  .field input { flex:1; border:none; outline:none; font-size:16px; background:transparent; min-width:0; }
+  .field span { color:var(--navy); margin-right:8px; }
+  .link { color:var(--goldd); font-weight:700; font-size:14px; cursor:pointer; }
+  .right { text-align:right; margin-top:12px; }
+  .btn { width:100%; height:52px; border:none; border-radius:12px; background:var(--gold); color:var(--navy); font-size:16px; font-weight:700; cursor:pointer; margin-top:16px; }
+  .btn:disabled { opacity:.6; }
+  .err { color:var(--red); font-size:13px; margin-top:10px; min-height:0; }
+  .ok { color:#15803D; font-size:13px; margin-top:10px; }
+  .foot { text-align:center; margin-top:16px; color:var(--muted); font-size:14px; }
+  .otp input { text-align:center; font-size:28px; letter-spacing:10px; color:var(--navy); }
+  .hidden { display:none !important; }
+  /* home */
+  #home { background:var(--navy); color:#fff; padding-bottom:70px; }
+  .hwrap { padding:18px 16px; }
+  .top { display:flex; align-items:center; gap:10px; } .top svg { width:44px; }
+  .quick { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:16px 0; }
+  .q { background:var(--navy2); border-radius:14px; padding:12px 4px; text-align:center; font-size:12px; cursor:pointer; }
+  .q b { display:block; font-size:22px; margin-bottom:4px; } .q.on { background:var(--gold); color:var(--navy); font-weight:700; }
+  .wcard { background:#fff; color:var(--navy); border-radius:18px; padding:14px; margin-bottom:16px; }
+  .wcard h3, .ncard h3 { margin:0 0 12px; font-size:17px; }
+  .metals { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .m { border-radius:14px; height:128px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:12px 4px; cursor:pointer; }
+  .m .sym { font-size:34px; font-weight:700; flex:1; display:flex; align-items:center; }
+  .m .nm { font-weight:700; font-size:17px; } .m .si { font-size:11px; }
+  .g { background:linear-gradient(135deg,#FFD86B,#C9921A); color:#fff; }
+  .sv { background:linear-gradient(135deg,#E6EAF0,#8E98A6); color:var(--navy); }
+  .pt { background:linear-gradient(135deg,#8C6CF5,#3B2A9E); color:#fff; }
+  .ncard { background:var(--navy2); border-radius:18px; padding:14px; margin-bottom:16px; }
+  .chartrow { display:flex; gap:10px; align-items:center; }
+  .legend div { font-size:13px; margin:8px 0; } .legend i { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; }
+  .chips { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:10px; }
+  .chip { background:#ffffff22; border-radius:10px; text-align:center; padding:7px 0; font-size:13px; cursor:pointer; }
+  .chip.on { background:var(--gold); color:var(--navy); font-weight:700; }
+  .loans { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .l { border:1px solid #E5E7EB; border-radius:12px; text-align:center; padding:12px 2px; font-size:12px; cursor:pointer; }
+  .l b { display:block; font-size:24px; }
+  .nav { position:absolute; bottom:0; left:0; right:0; background:#071427; display:grid; grid-template-columns:repeat(4,1fr); padding:10px 0 14px; text-align:center; font-size:11px; color:#AEB8CC; z-index:5; }
+  .nav div { cursor:pointer; } .nav b { display:block; font-size:20px; } .nav .on { color:var(--gold); font-weight:700; }
+  .toast { position:absolute; left:50%; bottom:90px; transform:translateX(-50%); background:#111c; color:#fff; padding:10px 16px; border-radius:20px; font-size:13px; z-index:10; display:none; white-space:nowrap; }
+  /* side panel */
+  .side { width:300px; background:#fff; border-radius:16px; padding:18px; font-size:14px; color:#333; box-shadow:0 6px 20px rgba(0,0,0,.08); }
+  .side h3 { margin:0 0 8px; color:var(--navy); } .side code { background:#f1f3f7; padding:1px 5px; border-radius:4px; }
+  .side ol { padding-left:18px; } .side li { margin:6px 0; }
+  .dot { display:inline-block; width:9px; height:9px; border-radius:50%; background:#999; margin-right:6px; }
+</style>
+</head>
+<body>
+
+<div class="phone"><div class="screen" id="screen">
+
+  <!-- SPLASH -->
+  <div class="page active" id="splash">
+    <svg viewBox="0 0 200 200" id="logo"><defs>
+      <linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE69A"/><stop offset=".5" stop-color="#F5B82E"/><stop offset="1" stop-color="#B07A12"/></linearGradient>
+      <linearGradient id="sl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#9AA3AE"/></linearGradient></defs>
+      <g id="logoG"><polygon points="100,18 186,178 146,178 100,90 54,178 14,178" fill="url(#gd)"/>
+      <polygon points="66,140 134,140 146,164 54,164" fill="url(#sl)"/>
+      <polygon points="100,4 110,16 100,28 90,16" fill="#FFE69A"/></g></svg>
+    <div class="brand" style="font-size:40px;margin-top:14px"><span class="a">Aur</span><span class="s">Sil</span></div>
+    <div class="tag" style="font-size:15px">Invest &nbsp;|&nbsp; Grow &nbsp;|&nbsp; Secure</div>
+    <div class="spinner"></div>
+    <div class="tag" id="splashStatus">Opening AurSil...</div>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="page" id="login">
+    <div class="hdr center">
+      <span class="gear" onclick="setServer()">âš™</span>
+      <svg viewBox="0 0 200 200" width="72"><use href="#logoG"/></svg>
+      <div class="brand" style="font-size:30px"><span class="a">Aur</span><span class="s">Sil</span></div>
+      <div class="tag">Invest &nbsp;|&nbsp; Grow &nbsp;|&nbsp; Secure</div>
+    </div>
+    <div class="card">
+      <h2>Welcome back!</h2><div class="sub">Log in to continue investing</div>
+      <label>User ID or Email</label><div class="field"><input id="lLogin" placeholder="Enter User ID or Email"></div>
+      <label>Password</label><div class="field"><input id="lPass" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')login()"><a class="link" style="font-size:13px" onclick="togglePw('lPass',this)">Show</a></div>
+      <div class="right"><a class="link" onclick="go('forgot')">Forgot password?</a></div>
+      <div class="err" id="lErr"></div>
+      <button class="btn" id="lBtn" onclick="login()">Login</button>
+      <div class="foot">New to AurSil? <a class="link" onclick="go('register')">Register</a></div>
+    </div>
+    <div class="foot" style="font-size:12px">ðŸ”’ Your data is protected with secure encryption</div>
+  </div>
+
+  <!-- REGISTER -->
+  <div class="page" id="register">
+    <div class="hdr withback"><span class="back" onclick="go('login')">â†</span><h1>Create Account</h1><p>Start investing in Gold, Silver and Platinum</p></div>
+    <div class="card">
+      <label>User ID</label><div class="field"><input id="rId" placeholder="e.g. suman_01"></div>
+      <label>Full Name</label><div class="field"><input id="rName" placeholder="Enter your full name"></div>
+      <label>Email</label><div class="field"><input id="rEmail" placeholder="you@example.com"></div>
+      <label>Mobile Number</label><div class="field"><span>+91</span><input id="rPhone" maxlength="10" placeholder="10-digit mobile number"></div>
+      <label>Password</label><div class="field"><input id="rPass" type="password" placeholder="Min 8 characters, letters + numbers"></div>
+      <label>Confirm Password</label><div class="field"><input id="rConf" type="password" placeholder="Re-enter password"></div>
+      <div class="err" id="rErr"></div>
+      <button class="btn" id="rBtn" onclick="register()">Register &amp; Send OTP</button>
+      <div class="foot">Already have an account? <a class="link" onclick="go('login')">Login</a></div>
+    </div>
+  </div>
+
+  <!-- OTP -->
+  <div class="page" id="otp">
+    <div class="hdr withback"><span class="back" onclick="go('register')">â†</span><h1>Verify Email</h1><p>Enter the 6-digit code we emailed you</p></div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:26px">âœ‰ï¸</div>
+      <div class="sub" id="oTo"></div>
+      <div class="field otp"><input id="oCode" maxlength="6" placeholder="â— â— â— â— â— â—" oninput="if(this.value.length===6)verify()"></div>
+      <div class="err" id="oErr"></div>
+      <button class="btn" id="oBtn" onclick="verify()">Verify</button>
+      <div class="foot">Didn't get the code? <a class="link" id="oResend" onclick="resend()">Resend OTP</a></div>
+    </div>
+  </div>
+
+  <!-- FORGOT -->
+  <div class="page" id="forgot">
+    <div class="hdr withback"><span class="back" onclick="go('login')">â†</span><h1>Forgot Password</h1><p id="fSub">We'll email you a one-time password</p></div>
+    <div class="card">
+      <label>Registered Email</label><div class="field"><input id="fEmail" placeholder="you@example.com"></div>
+      <div id="fStep2" class="hidden">
+        <label>OTP</label><div class="field"><input id="fCode" maxlength="6" placeholder="6-digit code"></div>
+        <label>New Password</label><div class="field"><input id="fPass" type="password" placeholder="Min 8 characters, letters + numbers"></div>
+        <label>Confirm New Password</label><div class="field"><input id="fConf" type="password" placeholder="Re-enter new password"></div>
+      </div>
+      <div class="ok" id="fOk"></div><div class="err" id="fErr"></div>
+      <button class="btn" id="fBtn" onclick="forgot()">Send OTP</button>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="page" id="home"><div class="hwrap">
+    <div class="top">
+      <svg viewBox="0 0 200 200"><use href="#logoG"/></svg>
+      <div style="flex:1"><div class="brand" style="font-size:24px"><span class="a">Aur</span><span class="s">Sil</span></div><div class="tag" style="font-size:11px">Invest | Grow | Secure</div></div>
+      <span style="font-size:22px;cursor:pointer" onclick="soon('Notifications')">ðŸ””</span>
+    </div>
+    <div style="margin-top:14px"><div style="font-size:24px;font-weight:700" id="hWelcome">Welcome!</div><div class="tag" style="font-size:15px">Invest in your future today.</div></div>
+    <div class="quick">
+      <div class="q on"><b>ðŸ“Š</b>Overview</div><div class="q" onclick="soon('Loans')"><b>ðŸ‘›</b>Loans</div>
+      <div class="q" onclick="soon('My Investments')"><b>ðŸ‘¤</b>My Investments</div><div class="q" onclick="profile()"><b>â˜°</b>More</div>
+    </div>
+    <div class="wcard"><h3>Invest in Precious Metals</h3><div class="metals">
+      <div class="m g" onclick="soon('Gold investment')"><div class="sym">Au</div><div class="nm">Gold</div><div class="si">Start Investing â€º</div></div>
+      <div class="m sv" onclick="soon('Silver investment')"><div class="sym">Ag</div><div class="nm">Silver</div><div class="si">Start Investing â€º</div></div>
+      <div class="m pt" onclick="soon('Platinum investment')"><div class="sym">Pt</div><div class="nm">Platinum</div><div class="si">Start Investing â€º</div></div>
+    </div></div>
+    <div class="ncard"><h3>Market Price Trends</h3>
+      <div class="chartrow"><canvas id="chart" width="250" height="130"></canvas>
+        <div class="legend"><div><i style="background:#F5B82E"></i>Gold</div><div><i style="background:#D1D5DB"></i>Silver</div><div><i style="background:#A78BFA"></i>Platinum</div></div></div>
+      <div class="chips"><div class="chip on" onclick="range('1D',this)">1D</div><div class="chip" onclick="range('1W',this)">1W</div><div class="chip" onclick="range('1M',this)">1M</div><div class="chip" onclick="range('1Y',this)">1Y</div></div>
+    </div>
+    <div class="wcard"><h3 style="margin-bottom:2px">Loan Options</h3><div style="color:var(--muted);font-size:13px;margin-bottom:12px">Explore secured loans when needed.</div>
+      <div class="loans"><div class="l" onclick="soon('Personal Loan')"><b>ðŸ </b>Personal<br>Loan</div><div class="l" onclick="soon('Vehicle Loan')"><b>ðŸš—</b>Vehicle<br>Loan</div>
+      <div class="l" onclick="soon('Education Loan')"><b>ðŸŽ“</b>Education<br>Loan</div><div class="l" onclick="soon('Business Loan')"><b>ðŸ’¼</b>Business<br>Loan</div></div>
+    </div>
+  </div></div>
+  <div class="nav hidden" id="nav"><div class="on"><b>ðŸ </b>Overview</div><div onclick="soon('Market')"><b>ðŸ“ˆ</b>Market</div><div onclick="soon('Loans')"><b>ðŸ‘›</b>Loans</div><div onclick="profile()"><b>ðŸ‘¤</b>Profile</div></div>
+  <div class="toast" id="toast"></div>
+</div></div>
+
+<div class="side">
+  <h3>AurSil â€“ Browser Preview</h3>
+  <p>Same screens as <code>AurSil.apk</code>, connected to the <b>real API + SQL Server database <code>aursil</code></b>.</p>
+  <p><span class="dot" id="apiDot"></span><span id="apiStatus">Checking API...</span></p>
+  <ol>
+    <li>Tap <b>Register</b>, fill the form</li>
+    <li>OTP: no email server is set up yet, so the code appears in the <b>API window</b> on the PC (line <code>OTP for ...</code>)</li>
+    <li>Enter OTP â†’ account becomes <b>Active</b></li>
+    <li>Login â†’ Home dashboard</li>
+    <li>Profile â†’ Logout</li>
+  </ol>
+  <p style="color:#666;font-size:12px">APK for the phone: <code>E:\AurSil\AurSil.apk</code></p>
+</div>
+
+<script>
+let API = localStorage.getItem('aursil_api') || 'http://localhost:5168';
+let otpEmail = '', fSent = false, timer;
+const $ = id => document.getElementById(id);
+
+function go(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  $(id).classList.add('active');
+  $('nav').classList.toggle('hidden', id !== 'home');
+  document.querySelectorAll('.err,.ok').forEach(e => e.textContent = '');
+  if (id === 'home') { const u = JSON.parse(localStorage.getItem('aursil_user') || 'null'); $('hWelcome').textContent = u ? `Welcome, ${u.name.split(' ')[0]}!` : 'Welcome!'; drawChart('1D'); }
+}
+
+async function call(path, body) {
+  try {
+    const r = await fetch(`${API}/api/auth/${path}`, { method:'POST', headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'true'}, body:JSON.stringify(body) });
+    const data = await r.json().catch(() => ({}));
+    return { ok:r.ok, status:r.status, data, msg:data.message || (r.ok ? '' : `Request failed (${r.status})`) };
+  } catch { return { ok:false, data:{}, msg:`Cannot reach the API at ${API}. Start it with start-api.ps1.` }; }
+}
+function busy(btn, on, label) { $(btn).disabled = on; $(btn).textContent = on ? 'Please wait...' : label; }
+const isEmail = s => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s);
+const pwErr = p => p.length < 8 ? 'Password must be at least 8 characters.' : (!/[a-z]/i.test(p) || !/\d/.test(p)) ? 'Password must contain letters and numbers.' : null;
+
+async function login() {
+  const login = $('lLogin').value.trim(), pw = $('lPass').value;
+  if (!login || !pw) return $('lErr').textContent = 'Please enter your User ID / Email and password.';
+  busy('lBtn', true, 'Login'); const r = await call('login', { login, password:pw }); busy('lBtn', false, 'Login');
+  if (r.ok) { localStorage.setItem('aursil_user', JSON.stringify(r.data.user || r.data)); $('lPass').value=''; return go('home'); }
+  if (r.data.needsVerification) { alert(r.msg); return openOtp(r.data.email); }
+  $('lErr').textContent = r.msg;
+}
+
+async function register() {
+  const b = { userId:$('rId').value.trim(), name:$('rName').value.trim(), email:$('rEmail').value.trim(), phone:$('rPhone').value.trim(), password:$('rPass').value };
+  const e = !/^[A-Za-z0-9_]{4,50}$/.test(b.userId) ? 'User ID must be 4-50 letters, numbers or underscore.'
+    : b.name.length < 2 ? 'Please enter your full name.' : !isEmail(b.email) ? 'Please enter a valid email address.'
+    : !/^[6-9]\d{9}$/.test(b.phone) ? 'Please enter a valid 10-digit mobile number.' : pwErr(b.password) || (b.password !== $('rConf').value ? 'Passwords do not match.' : null);
+  if (e) return $('rErr').textContent = e;
+  busy('rBtn', true, 'Register & Send OTP'); const r = await call('register', b); busy('rBtn', false, 'Register & Send OTP');
+  if (!r.ok) return $('rErr').textContent = r.msg;
+  openOtp(b.email.toLowerCase());
+}
+
+function openOtp(email) { otpEmail = email; $('oTo').innerHTML = `Code sent to<br><b>${email}</b>`; $('oCode').value=''; go('otp'); countdown(); }
+function countdown() {
+  let s = 30; clearInterval(timer); $('oResend').textContent = `Resend in ${s}s`;
+  timer = setInterval(() => { s--; $('oResend').textContent = s > 0 ? `Resend in ${s}s` : 'Resend OTP'; if (s <= 0) clearInterval(timer); }, 1000);
+}
+async function verify() {
+  const code = $('oCode').value.trim();
+  if (!/^\d{6}$/.test(code)) return $('oErr').textContent = 'Please enter the 6-digit OTP.';
+  busy('oBtn', true, 'Verify'); const r = await call('verify-otp', { email:otpEmail, code }); busy('oBtn', false, 'Verify');
+  if (!r.ok) { $('oCode').value=''; return $('oErr').textContent = r.msg; }
+  alert('Account verified âœ…\nYour AurSil account is active. Please log in.'); go('login');
+}
+async function resend() {
+  if ($('oResend').textContent !== 'Resend OTP') return;
+  const r = await call('resend-otp', { email:otpEmail }); if (!r.ok) return $('oErr').textContent = r.msg;
+  toast('A new OTP has been sent'); countdown();
+}
+
+async function forgot() {
+  const email = $('fEmail').value.trim();
+  if (!fSent) {
+    if (!isEmail(email)) return $('fErr').textContent = 'Please enter a valid email address.';
+    busy('fBtn', true, 'Send OTP'); const r = await call('forgot-password', { email }); busy('fBtn', false, 'Send OTP');
+    if (!r.ok) return $('fErr').textContent = r.msg;
+    fSent = true; $('fEmail').disabled = true; $('fStep2').classList.remove('hidden'); $('fSub').textContent = 'Enter the OTP and choose a new password';
+    $('fOk').textContent = r.msg; $('fBtn').textContent = 'Reset Password'; return;
+  }
+  const code = $('fCode').value.trim(), pw = $('fPass').value;
+  const e = !/^\d{6}$/.test(code) ? 'Please enter the 6-digit OTP.' : pwErr(pw) || (pw !== $('fConf').value ? 'Passwords do not match.' : null);
+  if (e) { $('fOk').textContent=''; return $('fErr').textContent = e; }
+  busy('fBtn', true, 'Reset Password'); const r = await call('reset-password', { email, code, newPassword:pw }); busy('fBtn', false, 'Reset Password');
+  if (!r.ok) { $('fOk').textContent=''; return $('fErr').textContent = r.msg; }
+  alert('Password changed âœ…\n' + r.msg); fSent = false; $('fEmail').disabled = false; $('fStep2').classList.add('hidden'); $('fBtn').textContent='Send OTP'; go('login');
+}
+
+function togglePw(id, el) { const i = $(id); i.type = i.type === 'password' ? 'text' : 'password'; el.textContent = i.type === 'password' ? 'Show' : 'Hide'; }
+function setServer() { const u = prompt('AurSil API URL:', API); if (u) { API = u.trim().replace(/\/$/, ''); localStorage.setItem('aursil_api', API); checkApi(); } }
+function toast(t) { const el = $('toast'); el.textContent = t; el.style.display = 'block'; clearTimeout(el._t); el._t = setTimeout(() => el.style.display = 'none', 1800); }
+function soon(name) { toast(`${name}: coming soon`); }
+function profile() {
+  const u = JSON.parse(localStorage.getItem('aursil_user') || 'null');
+  if (confirm(`${u ? `${u.name}\n${u.email}\n+91 ${u.phone}\n\n` : ''}Logout?`)) { localStorage.removeItem('aursil_user'); go('login'); }
+}
+
+const DATA = {
+  '1D':[[62,64,63,67,66,70,72,71,75,80],[38,40,39,42,41,44,43,46,47,50],[22,24,23,26,28,27,30,32,33,36]],
+  '1W':[[55,58,57,61,64,63,68,70,74,78],[42,41,44,43,46,48,47,49,52,51],[30,28,29,31,30,33,32,35,34,37]],
+  '1M':[[48,52,56,54,60,63,61,66,72,76],[35,38,36,41,40,44,46,45,48,53],[26,25,28,30,29,31,35,34,38,40]],
+  '1Y':[[30,36,40,45,43,52,58,63,70,82],[28,30,33,32,37,40,42,47,49,55],[35,32,30,33,31,34,36,35,39,42]] };
+function drawChart(r) {
+  const c = $('chart'), x = c.getContext('2d'), w = c.width, h = c.height; x.clearRect(0,0,w,h);
+  x.strokeStyle = '#2A4470'; x.lineWidth = 1; for (let i=0;i<=4;i++){ const y=h*i/4; x.beginPath(); x.moveTo(0,y); x.lineTo(w,y); x.stroke(); }
+  ['#F5B82E','#D1D5DB','#A78BFA'].forEach((col, s) => {
+    const v = DATA[r][s], st = w/(v.length-1); x.strokeStyle = col; x.fillStyle = col; x.lineWidth = 2.5; x.beginPath();
+    v.forEach((p,i) => { const X=i*st, Y=h-p/100*h; i ? x.lineTo(X,Y) : x.moveTo(X,Y); }); x.stroke();
+    v.forEach((p,i) => { x.beginPath(); x.arc(i*st, h-p/100*h, 3, 0, 7); x.fill(); });
+  });
+}
+function range(r, el) { document.querySelectorAll('.chip').forEach(c => c.classList.remove('on')); el.classList.add('on'); drawChart(r); }
+
+async function checkApi() {
+  try { await fetch(API + '/', { headers:{'ngrok-skip-browser-warning':'true'} });$('apiDot').style.background = '#16a34a'; $('apiStatus').textContent = `API connected (${API})`; }
+  catch { $('apiDot').style.background = '#dc2626'; $('apiStatus').textContent = `API not running at ${API}. Run start-api.ps1`; }
+}
+
+checkApi();
+setTimeout(() => $('splashStatus').textContent = 'Loading your account...', 1200);
+setTimeout(() => go(localStorage.getItem('aursil_user') ? 'home' : 'login'), 2600);
+</script>
+</body>
+</html>

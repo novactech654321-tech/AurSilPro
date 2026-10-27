@@ -1,0 +1,7 @@
+bin/
+obj/
+.vs/
+*.user
+
+# Secrets (Gmail app password, Razorpay keys) - never commit
+AurSil.Api/appsettings.Development.json
