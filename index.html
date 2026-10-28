@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AurSil – Invest in Gold, Silver & Platinum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:#0B1F3A; --navy2:#16305A; --navy3:#071427; --gold:#F5B82E; --gold2:#C9921A; --silver:#C0C7D1;
+    --bg:#F4F6FA; --card:#FFFFFF; --text:#111827; --muted:#6B7280; --line:#E5E7EB; --up:#16A34A; --down:#DC2626;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
+  body { font-family:Poppins, "Segoe UI", Arial, sans-serif; background:var(--bg); color:var(--text); line-height:1.5; }
+  a { color:inherit; text-decoration:none; }
+  .container { width:min(1180px, 100% - 32px); margin:0 auto; }
+  .brand { font-weight:700; font-size:26px; display:flex; align-items:center; gap:10px; }
+  .brand .a { color:var(--gold); } .brand .s { color:var(--silver); }
+  .brand small { display:block; font-size:11px; font-weight:400; color:#AEB8CC; letter-spacing:.5px; margin-top:-6px; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; height:46px; padding:0 22px; border-radius:12px;
+         font:600 15px Poppins, sans-serif; cursor:pointer; border:none; transition:.2s; }
+  .btn-gold { background:var(--gold); color:var(--navy); } .btn-gold:hover { background:#FFC94D; transform:translateY(-1px); }
+  .btn-outline { background:transparent; color:var(--gold); border:2px solid var(--gold); } .btn-outline:hover { background:#F5B82E1A; }
+  .btn-light { background:#fff; color:var(--navy); border:1px solid var(--line); }
+  .up { color:var(--up); } .down { color:var(--down); }
+
+  /* ---------- header ---------- */
+  header { background:var(--navy); position:sticky; top:0; z-index:50; box-shadow:0 2px 12px #0003; }
+  .nav { display:flex; align-items:center; justify-content:space-between; height:72px; }
+  .nav ul { display:flex; gap:28px; list-style:none; color:#D7DEEA; font-size:15px; }
+  .nav ul a:hover, .nav ul a.on { color:var(--gold); }
+  .nav .actions { display:flex; gap:10px; }
+  .menu-btn { display:none; background:none; border:none; color:#fff; font-size:26px; cursor:pointer; }
+
+  /* ---------- ticker ---------- */
+  .ticker { background:var(--navy3); color:#D7DEEA; font-size:13px; overflow:hidden; white-space:nowrap; }
+  .ticker .track { display:inline-flex; gap:48px; padding:8px 0; animation:scroll 30s linear infinite; }
+  .ticker b { color:#fff; margin:0 6px; }
+  @keyframes scroll { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+
+  /* ---------- hero ---------- */
+  .hero { background:radial-gradient(circle at 80% 20%, #1D3E70 0, var(--navy) 55%); color:#fff; padding:70px 0 110px; }
+  .hero .grid { display:grid; grid-template-columns:1.1fr .9fr; gap:48px; align-items:center; }
+  .hero h1 { font-size:46px; line-height:1.15; font-weight:700; }
+  .hero h1 span { color:var(--gold); }
+  .hero p { color:#B8C2D6; font-size:17px; margin:18px 0 28px; max-width:520px; }
+  .hero .cta { display:flex; gap:14px; flex-wrap:wrap; }
+  .hero .stats { display:flex; gap:36px; margin-top:40px; }
+  .hero .stats b { display:block; font-size:24px; color:var(--gold); } .hero .stats span { font-size:13px; color:#AEB8CC; }
+
+  /* buy widget */
+  .widget { background:#fff; color:var(--text); border-radius:22px; padding:24px; box-shadow:0 20px 50px #0006; }
+  .widget h3 { color:var(--navy); font-size:20px; margin-bottom:14px; }
+  .seg { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+  .seg button { height:40px; border-radius:10px; border:1px solid var(--line); background:#fff; font:500 14px Poppins; cursor:pointer; color:var(--navy); }
+  .seg button.on { background:var(--navy); color:#fff; border-color:var(--navy); }
+  .toggle { display:grid; grid-template-columns:1fr 1fr; background:#EEF1F6; border-radius:12px; padding:4px; margin-bottom:14px; }
+  .toggle button { height:38px; border:none; border-radius:10px; background:transparent; font:500 14px Poppins; cursor:pointer; color:var(--navy); }
+  .toggle button.on { background:var(--gold); font-weight:600; }
+  .rate { display:flex; justify-content:space-between; align-items:center; background:#FFF8E6; border:1px solid #F5E1A6; border-radius:12px; padding:10px 14px; margin-bottom:14px; font-size:14px; }
+  .rate b { font-size:18px; color:var(--navy); }
+  .live { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--up); font-weight:600; }
+  .live i { width:8px; height:8px; border-radius:50%; background:var(--up); animation:blink 1.4s infinite; }
+  @keyframes blink { 50% { opacity:.3; } }
+  .input { display:flex; align-items:center; border:2px solid var(--line); border-radius:14px; height:60px; padding:0 16px; gap:8px; }
+  .input:focus-within { border-color:var(--gold); }
+  .input span { font-size:22px; font-weight:600; color:var(--navy); }
+  .input input { flex:1; border:none; outline:none; font:600 24px Poppins; color:var(--navy); min-width:0; background:transparent; }
+  .quick { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:12px 0; }
+  .quick button { height:36px; border-radius:18px; border:1px solid var(--line); background:#fff; font:500 13px Poppins; cursor:pointer; color:var(--navy); }
+  .quick button:hover { border-color:var(--gold); background:#FFF8E6; }
+  .breakdown { border-top:1px dashed var(--line); padding-top:12px; font-size:14px; }
+  .breakdown div { display:flex; justify-content:space-between; padding:3px 0; } .breakdown span:first-child { color:var(--muted); }
+  .breakdown .total { font-weight:700; font-size:17px; color:var(--navy); border-top:1px solid var(--line); margin-top:6px; padding-top:8px; }
+  .widget .btn { width:100%; margin-top:14px; height:52px; font-size:16px; }
+
+  /* ---------- sections ---------- */
+  section { padding:70px 0; }
+  .title { text-align:center; margin-bottom:40px; }
+  .title h2 { font-size:32px; color:var(--navy); } .title p { color:var(--muted); margin-top:6px; }
+  .title .eyebrow { display:inline-block; font-size:12px; font-weight:600; letter-spacing:1.5px; color:var(--gold2); background:#FFF4D6; padding:4px 12px; border-radius:20px; margin-bottom:10px; }
+
+  /* price cards */
+  .prices { margin-top:-70px; padding-top:0; }
+  .cards3 { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  .metal { border-radius:20px; padding:24px; color:#fff; position:relative; overflow:hidden; box-shadow:0 12px 30px #0B1F3A26; }
+  .metal::after { content:""; position:absolute; right:-40px; top:-40px; width:160px; height:160px; border-radius:50%; background:#ffffff1f; }
+  .metal.gold { background:linear-gradient(135deg,#FFD86B,#C9921A); }
+  .metal.silver { background:linear-gradient(135deg,#E6EAF0,#8E98A6); color:var(--navy); }
+  .metal.platinum { background:linear-gradient(135deg,#8C6CF5,#3B2A9E); }
+  .metal .sym { font-size:40px; font-weight:700; opacity:.85; }
+  .metal .name { font-size:20px; font-weight:600; }
+  .metal .price { font-size:30px; font-weight:700; margin-top:10px; }
+  .metal .meta { display:flex; justify-content:space-between; font-size:13px; margin-top:6px; opacity:.95; }
+  .metal .chg { background:#ffffff33; padding:2px 10px; border-radius:20px; font-weight:600; }
+  .metal .btn { margin-top:18px; width:100%; background:#fff; color:var(--navy); }
+
+  /* chart */
+  .chart-card { background:var(--navy); border-radius:24px; padding:28px; color:#fff; }
+  .chart-head { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:18px; }
+  .chart-head h3 { font-size:22px; } .chart-head .big { font-size:34px; font-weight:700; color:var(--gold); }
+  .chips { display:flex; gap:8px; flex-wrap:wrap; }
+  .chips button { height:36px; padding:0 16px; border-radius:10px; border:none; background:#ffffff1a; color:#fff; font:500 13px Poppins; cursor:pointer; }
+  .chips button.on { background:var(--gold); color:var(--navy); font-weight:600; }
+  .legend { display:flex; gap:18px; font-size:13px; color:#B8C2D6; margin-top:14px; } .legend i { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; }
+  canvas { width:100%; height:300px; display:block; }
+
+  /* features */
+  .features { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  .feature { background:#fff; border-radius:18px; padding:24px; border:1px solid var(--line); transition:.2s; }
+  .feature:hover { transform:translateY(-4px); box-shadow:0 12px 30px #0B1F3A14; }
+  .feature .ic { width:54px; height:54px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; margin-bottom:14px; }
+  .feature h4 { color:var(--navy); font-size:18px; } .feature p { color:var(--muted); font-size:14px; margin-top:4px; }
+
+  /* how it works */
+  .steps { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; counter-reset:s; }
+  .step { text-align:center; padding:10px; }
+  .step .n { width:60px; height:60px; border-radius:50%; background:var(--navy); color:var(--gold); font-size:22px; font-weight:700; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; box-shadow:0 0 0 6px #F5B82E33; }
+  .step h4 { color:var(--navy); } .step p { color:var(--muted); font-size:14px; }
+
+  /* loans */
+  .loans { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
+  .loan { background:#fff; border-radius:18px; padding:24px 18px; text-align:center; border:1px solid var(--line); cursor:pointer; transition:.2s; }
+  .loan:hover { border-color:var(--gold); }
+  .loan .ic { font-size:38px; } .loan h4 { color:var(--navy); margin-top:8px; } .loan p { color:var(--muted); font-size:13px; }
+
+  /* portfolio preview */
+  .dash { display:grid; grid-template-columns:1fr 1.3fr; gap:20px; }
+  .pf { background:linear-gradient(135deg,#FFD86B,#C9921A); border-radius:22px; padding:26px; color:var(--navy); }
+  .pf .v { font-size:36px; font-weight:700; } .pf .row { display:flex; justify-content:space-between; margin-top:14px; font-size:14px; }
+  .holdings { background:#fff; border-radius:22px; padding:20px; border:1px solid var(--line); }
+  .holding { display:flex; align-items:center; gap:14px; padding:12px 6px; border-bottom:1px solid #EEF1F6; } .holding:last-child { border:0; }
+  .badge { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; }
+  .holding .mid { flex:1; } .holding b { color:var(--navy); } .holding small { display:block; color:var(--muted); }
+  .holding .r { text-align:right; }
+
+  /* app banner */
+  .app { background:var(--navy); border-radius:26px; color:#fff; padding:40px; display:grid; grid-template-columns:1.2fr .8fr; gap:30px; align-items:center; }
+  .app h2 { font-size:30px; } .app h2 span { color:var(--gold); } .app p { color:#B8C2D6; margin:10px 0 22px; }
+  .phone { width:220px; height:400px; margin:0 auto; background:#111; border-radius:34px; padding:10px; box-shadow:0 20px 40px #0008; }
+  .phone .scr { width:100%; height:100%; border-radius:26px; background:var(--navy2); padding:18px 14px; display:flex; flex-direction:column; gap:10px; }
+  .phone .mini { border-radius:12px; padding:10px; font-size:12px; font-weight:600; }
+
+  /* footer */
+  footer { background:var(--navy3); color:#AEB8CC; padding:50px 0 24px; margin-top:40px; font-size:14px; }
+  .fgrid { display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:30px; }
+  footer h5 { color:#fff; font-size:15px; margin-bottom:12px; } footer li { list-style:none; margin:6px 0; } footer li a:hover { color:var(--gold); }
+  .copy { border-top:1px solid #ffffff1a; margin-top:30px; padding-top:18px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:13px; }
+
+  /* modal */
+  .overlay { position:fixed; inset:0; background:#071427cc; display:none; align-items:center; justify-content:center; z-index:100; padding:16px; }
+  .overlay.show { display:flex; }
+  .modal { background:#fff; border-radius:22px; width:min(420px, 100%); overflow:hidden; animation:up .25s; }
+  @keyframes up { from { transform:translateY(20px); opacity:0; } to { transform:none; opacity:1; } }
+  .modal .mh { background:var(--navy); color:#fff; padding:24px; text-align:center; position:relative; }
+  .modal .mh .x { position:absolute; right:16px; top:12px; font-size:22px; cursor:pointer; color:#AEB8CC; }
+  .modal .mb { padding:22px; }
+  .modal label { display:block; font-size:13px; color:var(--muted); margin:10px 0 4px; }
+  .modal .f { height:48px; border:1px solid #D7DCE5; border-radius:12px; width:100%; padding:0 12px; font:15px Poppins; outline:none; }
+  .modal .f:focus { border-color:var(--gold); }
+  .modal .btn { width:100%; margin-top:16px; }
+  .modal .alt { text-align:center; margin-top:14px; font-size:14px; color:var(--muted); } .modal .alt a { color:var(--gold2); font-weight:600; cursor:pointer; }
+  .otp { display:flex; gap:8px; justify-content:center; margin-top:10px; } .otp input { width:46px; height:54px; text-align:center; font:700 22px Poppins; border:1px solid #D7DCE5; border-radius:10px; }
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--navy); color:#fff; padding:12px 20px; border-radius:12px; display:none; z-index:200; box-shadow:0 8px 20px #0005; }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 960px) {
+    .hero .grid, .dash, .app { grid-template-columns:1fr; }
+    .cards3, .features { grid-template-columns:1fr 1fr; }
+    .steps, .loans { grid-template-columns:1fr 1fr; }
+    .fgrid { grid-template-columns:1fr 1fr; }
+    .nav ul { display:none; }
+    .nav ul.open { display:flex; flex-direction:column; position:absolute; top:72px; left:0; right:0; background:var(--navy); padding:16px 24px; gap:14px; }
+    .menu-btn { display:block; }
+    .hero h1 { font-size:36px; }
+  }
+  @media (max-width: 600px) {
+    .cards3, .features, .steps, .loans, .fgrid { grid-template-columns:1fr; }
+    .nav .actions .btn-outline { display:none; }
+    .hero { padding:44px 0 100px; } .hero h1 { font-size:30px; } .hero .stats { gap:20px; }
+    section { padding:50px 0; } .title h2 { font-size:26px; }
+    .app { padding:26px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header>
+  <div class="container nav">
+    <a href="#" class="brand">
+      <svg width="40" height="40" viewBox="0 0 200 200"><defs>
+        <linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE69A"/><stop offset=".5" stop-color="#F5B82E"/><stop offset="1" stop-color="#B07A12"/></linearGradient>
+        <linearGradient id="sl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#9AA3AE"/></linearGradient></defs>
+        <polygon points="100,18 186,178 146,178 100,90 54,178 14,178" fill="url(#gd)"/><polygon points="66,140 134,140 146,164 54,164" fill="url(#sl)"/><polygon points="100,4 110,16 100,28 90,16" fill="#FFE69A"/></svg>
+      <div><span class="a">Aur</span><span class="s">Sil</span><small>INVEST | GROW | SECURE</small></div>
+    </a>
+    <ul id="menu">
+      <li><a href="#home" class="on">Home</a></li>
+      <li><a href="#prices">Live Prices</a></li>
+      <li><a href="#chart">Market</a></li>
+      <li><a href="#portfolio">Portfolio</a></li>
+      <li><a href="#loans">Loans</a></li>
+      <li><a href="#features">Why AurSil</a></li>
+    </ul>
+    <div class="actions">
+      <button class="btn btn-outline" onclick="openModal('login')">Login</button>
+      <button class="btn btn-gold" onclick="openModal('register')">Register</button>
+      <button class="menu-btn" onclick="document.getElementById('menu').classList.toggle('open')">☰</button>
+    </div>
+  </div>
+</header>
+
+<!-- ================= TICKER ================= -->
+<div class="ticker"><div class="track" id="ticker"></div></div>
+
+<!-- ================= HERO ================= -->
+<div class="hero" id="home">
+  <div class="container grid">
+    <div>
+      <h1>Invest in <span>Gold, Silver</span> and <span>Platinum</span> — right at your fingertips.</h1>
+      <p>Start with just ₹10. Buy 24K digital gold, 99.9% silver and platinum at live market prices, stored safely and sellable anytime straight to your bank account.</p>
+      <div class="cta">
+        <button class="btn btn-gold" onclick="openModal('register')">Start Investing →</button>
+        <a class="btn btn-outline" href="#prices">View Live Prices</a>
+      </div>
+      <div class="stats">
+        <div><b>₹10</b><span>Minimum investment</span></div>
+        <div><b>24K</b><span>99.9% pure gold</span></div>
+        <div><b>24×7</b><span>Buy &amp; sell anytime</span></div>
+      </div>
+    </div>
+
+    <!-- buy widget -->
+    <div class="widget">
+      <h3>Buy Precious Metals</h3>
+      <div class="seg" id="wMetal">
+        <button class="on" data-m="gold">Gold</button><button data-m="silver">Silver</button><button data-m="platinum">Platinum</button>
+      </div>
+      <div class="toggle"><button class="on" id="byInr" onclick="setMode(false)">Buy in ₹</button><button id="byGram" onclick="setMode(true)">Buy in grams</button></div>
+      <div class="rate"><div><span style="color:var(--muted)">Buy price</span><br><b id="wRate">₹13,237.17</b> / g</div><span class="live"><i></i>LIVE</span></div>
+      <div class="input"><span id="wPre">₹</span><input id="wAmt" value="1000" inputmode="decimal" oninput="calc()"><span id="wSuf" style="font-size:16px;color:var(--muted)"></span></div>
+      <div class="quick" id="wQuick"></div>
+      <div class="breakdown">
+        <div><span>You get</span><b id="wGet">0.0733 g</b></div>
+        <div><span>Metal value</span><span id="wVal">₹970.87</span></div>
+        <div><span>GST (3%)</span><span id="wGst">₹29.13</span></div>
+        <div class="total"><span>Total payable</span><span id="wTot">₹1,000.00</span></div>
+      </div>
+      <button class="btn btn-gold" onclick="openModal('login')">Buy Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= LIVE PRICES ================= -->
+<section class="prices" id="prices">
+  <div class="container">
+    <div class="cards3" id="metalCards"></div>
+    <p style="text-align:center;color:var(--muted);font-size:13px;margin-top:16px">Prices per gram, excluding 3% GST • Updated <span id="upd"></span></p>
+  </div>
+</section>
+
+<!-- ================= CHART ================= -->
+<section id="chart" style="padding-top:20px">
+  <div class="container">
+    <div class="chart-card">
+      <div class="chart-head">
+        <div>
+          <h3>Market Price Trends</h3>
+          <div class="big" id="cPrice">₹13,237.17</div>
+          <span id="cChange" class="down" style="font-size:14px;font-weight:600"></span>
+        </div>
+        <div>
+          <div class="chips" id="cMetal" style="margin-bottom:8px"><button class="on" data-m="gold">Gold</button><button data-m="silver">Silver</button><button data-m="platinum">Platinum</button></div>
+          <div class="chips" id="cRange"><button class="on" data-r="1D">1D</button><button data-r="1W">1W</button><button data-r="1M">1M</button><button data-r="1Y">1Y</button></div>
+        </div>
+      </div>
+      <canvas id="canvas"></canvas>
+      <div class="legend"><span><i style="background:#F5B82E"></i>Buy price</span><span><i style="background:#ffffff55"></i>Sell price</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PORTFOLIO PREVIEW ================= -->
+<section id="portfolio" style="background:#fff">
+  <div class="container">
+    <div class="title"><span class="eyebrow">YOUR DASHBOARD</span><h2>Track every gram you own</h2><p>See your holdings, current value and returns in one place.</p></div>
+    <div class="dash">
+      <div class="pf">
+        <div style="font-size:14px">Portfolio value</div>
+        <div class="v">₹2,651.41</div>
+        <div class="row"><span>Invested</span><b>₹2,814.76</b></div>
+        <div class="row"><span>Returns</span><b>-₹163.35 (-5.80%)</b></div>
+        <div class="row"><span>Holdings</span><b>2 metals</b></div>
+        <button class="btn" style="margin-top:20px;width:100%;background:var(--navy);color:#fff" onclick="openModal('login')">Open My Portfolio</button>
+      </div>
+      <div class="holdings">
+        <div class="holding"><div class="badge" style="background:linear-gradient(135deg,#FFD86B,#C9921A)">Au</div><div class="mid"><b>Gold</b><small>0.0733 g</small></div><div class="r"><b>₹941.61</b><small class="down">-₹58.39</small></div></div>
+        <div class="holding"><div class="badge" style="background:linear-gradient(135deg,#E6EAF0,#8E98A6);color:var(--navy)">Ag</div><div class="mid"><b>Silver</b><small>10.0000 g</small></div><div class="r"><b>₹1,709.80</b><small class="down">-₹104.96</small></div></div>
+        <div class="holding"><div class="badge" style="background:linear-gradient(135deg,#8C6CF5,#3B2A9E)">Pt</div><div class="mid"><b>Platinum</b><small>0 g</small></div><div class="r"><b>₹0.00</b><small>Not invested</small></div></div>
+        <div style="margin-top:12px;font-weight:600;color:var(--navy)">Recent transactions</div>
+        <div class="holding"><div class="badge" style="background:#FFF4D6;color:var(--gold2)">Au</div><div class="mid"><b>Bought Gold</b><small>0.0733 g @ ₹13,237.17/g • 27 Oct 2026</small></div><div class="r"><b>- ₹1,000.00</b><small>Completed</small></div></div>
+        <div class="holding"><div class="badge" style="background:#FFF4D6;color:var(--gold2)">Au</div><div class="mid"><b>Sold Gold</b><small>0.0200 g @ ₹12,845.92/g • 27 Oct 2026</small></div><div class="r"><b class="up">+ ₹256.92</b><small>Paid to SBI XXXX9012</small></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HOW IT WORKS ================= -->
+<section>
+  <div class="container">
+    <div class="title"><span class="eyebrow">HOW IT WORKS</span><h2>Start investing in 4 simple steps</h2></div>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><h4>Register</h4><p>Sign up with your email and mobile. Verify with an OTP.</p></div>
+      <div class="step"><div class="n">2</div><h4>Choose a metal</h4><p>Gold, silver or platinum at live market prices.</p></div>
+      <div class="step"><div class="n">3</div><h4>Pay securely</h4><p>Buy in rupees or grams via UPI, card or netbanking.</p></div>
+      <div class="step"><div class="n">4</div><h4>Sell anytime</h4><p>Get money credited straight to your bank account.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LOANS ================= -->
+<section id="loans" style="background:#fff">
+  <div class="container">
+    <div class="title"><span class="eyebrow">LOAN OPTIONS</span><h2>Explore secured loans when needed</h2><p>Enquire about loans backed by your metal holdings.</p></div>
+    <div class="loans">
+      <div class="loan" onclick="toast('Personal loan enquiry: coming soon')"><div class="ic">🏠</div><h4>Personal Loan</h4><p>For your everyday needs</p></div>
+      <div class="loan" onclick="toast('Vehicle loan enquiry: coming soon')"><div class="ic">🚗</div><h4>Vehicle Loan</h4><p>Drive home your dream car</p></div>
+      <div class="loan" onclick="toast('Education loan enquiry: coming soon')"><div class="ic">🎓</div><h4>Education Loan</h4><p>Invest in your future</p></div>
+      <div class="loan" onclick="toast('Business loan enquiry: coming soon')"><div class="ic">💼</div><h4>Business Loan</h4><p>Grow your business</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FEATURES ================= -->
+<section id="features">
+  <div class="container">
+    <div class="title"><span class="eyebrow">WHY AURSIL</span><h2>Simple, secure and transparent</h2></div>
+    <div class="features">
+      <div class="feature"><div class="ic" style="background:#FFF4D6">🪙</div><h4>Investments</h4><p>Invest in gold, silver and platinum from just ₹10.</p></div>
+      <div class="feature"><div class="ic" style="background:#E0E7FF">📈</div><h4>Live Market Prices</h4><p>Real-time prices with 1D, 1W, 1M and 1Y charts.</p></div>
+      <div class="feature"><div class="ic" style="background:#DCFCE7">🛡️</div><h4>Bank-grade Security</h4><p>OTP login, encrypted passwords and secure payments.</p></div>
+      <div class="feature"><div class="ic" style="background:#FCE7F3">💼</div><h4>My Investments</h4><p>Track holdings, value and full transaction history.</p></div>
+      <div class="feature"><div class="ic" style="background:#E0F2FE">🏦</div><h4>Instant Bank Payout</h4><p>Sell anytime and get paid to your linked bank account.</p></div>
+      <div class="feature"><div class="ic" style="background:#FEF3C7">🔔</div><h4>Notifications</h4><p>Email confirmations for every order and OTP.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= APP BANNER ================= -->
+<section style="padding-top:20px">
+  <div class="container">
+    <div class="app">
+      <div>
+        <h2>Get the <span>AurSil</span> mobile app</h2>
+        <p>Buy, sell and track your precious metals on the go. Live prices, instant payments and a portfolio in your pocket.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button class="btn btn-gold" onclick="toast('Android APK: ask the admin for AurSil.apk')">⬇ Download for Android</button>
+          <button class="btn btn-outline" onclick="toast('iOS app: coming soon')"> App Store (soon)</button>
+        </div>
+      </div>
+      <div class="phone"><div class="scr">
+        <div class="brand" style="font-size:18px"><span class="a">Aur</span><span class="s">Sil</span></div>
+        <div style="color:#fff;font-size:14px;font-weight:600">Welcome, Suman!</div>
+        <div class="mini" style="background:linear-gradient(135deg,#FFD86B,#C9921A);color:var(--navy)">Portfolio<br><span style="font-size:18px">₹2,651.41</span></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+          <div class="mini" style="background:linear-gradient(135deg,#FFD86B,#C9921A);color:#fff;text-align:center">Au<br>Gold</div>
+          <div class="mini" style="background:linear-gradient(135deg,#E6EAF0,#8E98A6);color:var(--navy);text-align:center">Ag<br>Silver</div>
+          <div class="mini" style="background:linear-gradient(135deg,#8C6CF5,#3B2A9E);color:#fff;text-align:center">Pt<br>Plat.</div>
+        </div>
+        <div class="mini" style="background:#0B1F3A;color:#AEB8CC;flex:1">📈 Market trends<svg viewBox="0 0 100 40" style="width:100%;margin-top:8px"><polyline points="0,30 15,26 30,28 45,18 60,20 75,10 100,6" fill="none" stroke="#F5B82E" stroke-width="2.5"/></svg></div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="container">
+    <div class="fgrid">
+      <div>
+        <div class="brand" style="font-size:24px"><span class="a">Aur</span><span class="s">Sil</span></div>
+        <p style="margin-top:10px;max-width:280px">A simple platform to invest in precious metals and explore secured loans when needed.</p>
+      </div>
+      <div><h5>Invest</h5><ul><li><a href="#prices">Gold</a></li><li><a href="#prices">Silver</a></li><li><a href="#prices">Platinum</a></li><li><a href="#chart">Market Prices</a></li></ul></div>
+      <div><h5>Company</h5><ul><li><a href="#features">About us</a></li><li><a href="#loans">Loans</a></li><li><a href="#">Careers</a></li><li><a href="#">Contact</a></li></ul></div>
+      <div><h5>Support</h5><ul><li><a href="#">Help centre</a></li><li><a href="#">Terms of use</a></li><li><a href="#">Privacy policy</a></li><li><a href="mailto:novactech654321@gmail.com">novactech654321@gmail.com</a></li></ul></div>
+    </div>
+    <div class="copy"><span>© 2026 AurSil. All rights reserved.</span><span>Prices shown are indicative. This is a project demo.</span></div>
+  </div>
+</footer>
+
+<!-- ================= MODALS ================= -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <!-- login -->
+    <div id="m-login">
+      <div class="mh"><span class="x" onclick="closeModal()">✕</span><div class="brand" style="justify-content:center;font-size:28px"><span class="a">Aur</span><span class="s">Sil</span></div><div style="color:#AEB8CC;font-size:14px">Welcome back! Log in to continue</div></div>
+      <div class="mb">
+        <label>User ID or Email</label><input class="f" placeholder="Enter User ID or Email">
+        <label>Password</label><input class="f" type="password" placeholder="Enter password">
+        <div style="text-align:right;margin-top:8px"><a style="color:var(--gold2);font-size:13px;font-weight:600;cursor:pointer" onclick="showModal('forgot')">Forgot password?</a></div>
+        <button class="btn btn-gold" onclick="toast('UI demo only – login is in the app')">Login</button>
+        <div class="alt">New to AurSil? <a onclick="showModal('register')">Register</a></div>
+      </div>
+    </div>
+    <!-- register -->
+    <div id="m-register">
+      <div class="mh"><span class="x" onclick="closeModal()">✕</span><h3>Create Account</h3><div style="color:#AEB8CC;font-size:14px">Start investing in Gold, Silver &amp; Platinum</div></div>
+      <div class="mb">
+        <label>User ID</label><input class="f" placeholder="e.g. suman_01">
+        <label>Full Name</label><input class="f" placeholder="Enter your full name">
+        <label>Email</label><input class="f" placeholder="you@example.com">
+        <label>Mobile Number</label><input class="f" placeholder="+91  10-digit mobile number">
+        <label>Password</label><input class="f" type="password" placeholder="Min 8 characters, letters + numbers">
+        <button class="btn btn-gold" onclick="showModal('otp')">Register &amp; Send OTP</button>
+        <div class="alt">Already have an account? <a onclick="showModal('login')">Login</a></div>
+      </div>
+    </div>
+    <!-- otp -->
+    <div id="m-otp">
+      <div class="mh"><span class="x" onclick="closeModal()">✕</span><h3>Verify Email</h3><div style="color:#AEB8CC;font-size:14px">Enter the 6-digit code we emailed you</div></div>
+      <div class="mb" style="text-align:center">
+        <div style="font-size:34px">✉️</div>
+        <div class="otp"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"></div>
+        <button class="btn btn-gold" onclick="toast('UI demo only – verification is in the app');closeModal()">Verify</button>
+        <div class="alt">Didn't get the code? <a onclick="toast('OTP resent (demo)')">Resend OTP</a></div>
+      </div>
+    </div>
+    <!-- forgot -->
+    <div id="m-forgot">
+      <div class="mh"><span class="x" onclick="closeModal()">✕</span><h3>Forgot Password</h3><div style="color:#AEB8CC;font-size:14px">We'll email you a one-time password</div></div>
+      <div class="mb">
+        <label>Registered Email</label><input class="f" placeholder="you@example.com">
+        <button class="btn btn-gold" onclick="showModal('otp')">Send OTP</button>
+        <div class="alt">Remembered it? <a onclick="showModal('login')">Back to Login</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+  // ---------- sample data (UI only, no API) ----------
+  const PRICES = {
+    gold:     { name:'Gold',     purity:'24K • 99.9%',  buy:13237.17, sell:12845.92, change:-0.29, spot:4016.80 },
+    silver:   { name:'Silver',   purity:'99.9% pure',   buy:176.19,   sell:170.98,   change:-1.18, spot:53.47 },
+    platinum: { name:'Platinum', purity:'99.95% pure',  buy:4979.43,  sell:4832.25,  change:-2.11, spot:1511.00 },
+  };
+  const GST = 0.03;
+  const inr = n => '₹' + n.toLocaleString('en-IN', { minimumFractionDigits:2, maximumFractionDigits:2 });
+  const pct = p => (p >= 0 ? '▲ ' : '▼ ') + Math.abs(p).toFixed(2) + '%';
+  const $ = id => document.getElementById(id);
+
+  // ticker
+  const tick = Object.values(PRICES).map(p => `${p.name} <b>${inr(p.buy)}/g</b><span class="${p.change >= 0 ? 'up' : 'down'}">${pct(p.change)}</span>`).join('<span style="opacity:.3">•</span>');
+  $('ticker').innerHTML = (tick + '<span style="opacity:.3">•</span>') .repeat(4);
+
+  // price cards
+  $('metalCards').innerHTML = Object.entries(PRICES).map(([k, p]) => `
+    <div class="metal ${k}">
+      <div style="display:flex;justify-content:space-between;align-items:center"><div><div class="name">${p.name}</div><div style="font-size:13px;opacity:.9">${p.purity}</div></div><div class="sym">${{gold:'Au',silver:'Ag',platinum:'Pt'}[k]}</div></div>
+      <div class="price">${inr(p.buy)}<span style="font-size:14px;font-weight:400"> /g</span></div>
+      <div class="meta"><span>Sell ${inr(p.sell)}/g</span><span class="chg">${pct(p.change)}</span></div>
+      <button class="btn" onclick="pickMetal('${k}')">Buy ${p.name}</button>
+    </div>`).join('');
+  $('upd').textContent = new Date().toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' });
+
+  // ---------- buy widget ----------
+  let wMetal = 'gold', byGrams = false;
+  document.querySelectorAll('#wMetal button').forEach(b => b.onclick = () => pickMetal(b.dataset.m, false));
+  function pickMetal(m, scroll = true) {
+    wMetal = m;
+    document.querySelectorAll('#wMetal button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
+    $('wRate').textContent = inr(PRICES[m].buy);
+    setMode(byGrams);
+    if (scroll) document.getElementById('home').scrollIntoView();
+  }
+  function setMode(g) {
+    byGrams = g;
+    $('byInr').classList.toggle('on', !g); $('byGram').classList.toggle('on', g);
+    $('wPre').textContent = g ? '' : '₹'; $('wSuf').textContent = g ? 'grams' : '';
+    const vals = !g ? [500, 1000, 2000, 5000] : wMetal === 'silver' ? [10, 50, 100, 500] : [0.5, 1, 2, 5];
+    $('wQuick').innerHTML = vals.map(v => `<button onclick="$('wAmt').value=${v};calc()">${g ? v + ' g' : '₹' + v.toLocaleString('en-IN')}</button>`).join('');
+    $('wAmt').value = g ? vals[1] : 1000;
+    calc();
+  }
+  function calc() {
+    const rate = PRICES[wMetal].buy, v = parseFloat($('wAmt').value) || 0;
+    let g, val, gst, tot;
+    if (byGrams) { g = v; val = g * rate; gst = val * GST; tot = val + gst; }
+    else { tot = v; val = tot / (1 + GST); gst = tot - val; g = Math.floor(val / rate * 10000) / 10000; }
+    $('wGet').textContent = (+g.toFixed(4)) + ' g ' + PRICES[wMetal].name;
+    $('wVal').textContent = inr(val); $('wGst').textContent = inr(gst); $('wTot').textContent = inr(tot);
+  }
+  setMode(false);
+
+  // ---------- chart (sample series) ----------
+  let cMetal = 'gold', cRange = '1D';
+  function series(metal, range) {
+    const n = { '1D':48, '1W':56, '1M':60, '1Y':60 }[range], base = PRICES[metal].buy;
+    const vol = { '1D':.004, '1W':.01, '1M':.03, '1Y':.09 }[range];
+    let seed = metal.length * 7 + range.charCodeAt(1), v = base * (1 + vol * .6);
+    const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+    const out = [];
+    for (let i = 0; i < n; i++) { v += (rnd() - .52) * base * vol / 6; out.push(v); }
+    const shift = base - out[out.length - 1]; return out.map(x => x + shift);
+  }
+  function draw() {
+    const c = $('canvas'), dpr = devicePixelRatio || 1, w = c.clientWidth, h = c.clientHeight;
+    c.width = w * dpr; c.height = h * dpr; const x = c.getContext('2d'); x.scale(dpr, dpr);
+    const buy = series(cMetal, cRange), spread = PRICES[cMetal].sell / PRICES[cMetal].buy, sell = buy.map(v => v * spread);
+    const all = buy.concat(sell), min = Math.min(...all), max = Math.max(...all), pad = 70, ph = h - 30;
+    const X = i => i * (w - pad) / (buy.length - 1), Y = v => 10 + (max - v) / (max - min) * ph;
+    x.strokeStyle = '#ffffff14'; x.fillStyle = '#AEB8CC'; x.font = '12px Poppins';
+    for (let i = 0; i <= 4; i++) { const y = 10 + ph * i / 4, val = max - (max - min) * i / 4;
+      x.beginPath(); x.moveTo(0, y); x.lineTo(w - pad, y); x.stroke(); x.fillText('₹' + Math.round(val).toLocaleString('en-IN'), w - pad + 8, y + 4); }
+    const g = x.createLinearGradient(0, 10, 0, h); g.addColorStop(0, '#F5B82E55'); g.addColorStop(1, '#F5B82E00');
+    x.beginPath(); buy.forEach((v, i) => i ? x.lineTo(X(i), Y(v)) : x.moveTo(X(i), Y(v))); x.lineTo(X(buy.length - 1), h); x.lineTo(0, h); x.fillStyle = g; x.fill();
+    const line = (arr, col, wd) => { x.beginPath(); arr.forEach((v, i) => i ? x.lineTo(X(i), Y(v)) : x.moveTo(X(i), Y(v))); x.strokeStyle = col; x.lineWidth = wd; x.lineJoin = 'round'; x.stroke(); };
+    line(sell, '#ffffff55', 1.5); line(buy, '#F5B82E', 3);
+    const lx = X(buy.length - 1), ly = Y(buy[buy.length - 1]); x.fillStyle = '#F5B82E'; x.beginPath(); x.arc(lx, ly, 5, 0, 7); x.fill();
+    const ch = (buy[buy.length - 1] - buy[0]) / buy[0] * 100;
+    $('cPrice').textContent = inr(PRICES[cMetal].buy);
+    $('cChange').textContent = `${pct(ch)} in ${cRange}`; $('cChange').className = ch >= 0 ? 'up' : 'down';
+  }
+  function bindChips(id, attr, set) {
+    document.querySelectorAll(`#${id} button`).forEach(b => b.onclick = () => {
+      document.querySelectorAll(`#${id} button`).forEach(o => o.classList.toggle('on', o === b)); set(b.dataset[attr]); draw(); });
+  }
+  bindChips('cMetal', 'm', v => cMetal = v); bindChips('cRange', 'r', v => cRange = v);
+  addEventListener('resize', draw); draw();
+
+  // ---------- nav highlight ----------
+  const links = [...document.querySelectorAll('#menu a')];
+  addEventListener('scroll', () => {
+    let cur = 'home';
+    links.forEach(a => { const s = document.querySelector(a.getAttribute('href')); if (s && s.getBoundingClientRect().top < 120) cur = a.getAttribute('href').slice(1); });
+    links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + cur));
+  });
+  links.forEach(a => a.onclick = () => $('menu').classList.remove('open'));
+
+  // ---------- modals / toast ----------
+  const MODALS = ['login', 'register', 'otp', 'forgot'];
+  function showModal(id) { MODALS.forEach(m => $('m-' + m).style.display = m === id ? 'block' : 'none'); }
+  function openModal(id) { showModal(id); $('overlay').classList.add('show'); }
+  function closeModal() { $('overlay').classList.remove('show'); }
+  document.querySelectorAll('.otp input').forEach((inp, i, all) => inp.oninput = () => { if (inp.value && all[i + 1]) all[i + 1].focus(); });
+  function toast(t) { const el = $('toast'); el.textContent = t; el.style.display = 'block'; clearTimeout(el._t); el._t = setTimeout(() => el.style.display = 'none', 2200); }
+</script>
+</body>
+</html>
