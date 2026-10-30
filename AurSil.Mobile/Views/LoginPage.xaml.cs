@@ -31,7 +31,7 @@ public partial class LoginPage : ContentPage
 		{
 			Session.SignIn(session.Token, session.User);
 			PasswordEntry.Text = "";
-			await Shell.Current.GoToAsync("//main/home");
+			await Shell.Current.GoToAsync(Session.HomeRoute);
 			return;
 		}
 

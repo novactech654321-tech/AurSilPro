@@ -34,6 +34,10 @@ public static class Format
 
 	public static string MetalBrushKey(string metal) => metal switch { "gold" => "GoldBrush", "silver" => "SilverBrush", _ => "PlatinumBrush" };
 
+	// Same rounding as the server's StoreService.DiscountedRate
+	public static decimal DiscountedRate(decimal buyRate, decimal percent) =>
+		percent > 0 ? Math.Round(buyRate * (1 - percent / 100), 2) : buyRate;
+
 	public static bool TryParseDecimal(string? text, out decimal value) =>
 		decimal.TryParse(text?.Trim().Replace(",", ""), NumberStyles.Number, CultureInfo.InvariantCulture, out value);
 }

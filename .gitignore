@@ -2,6 +2,10 @@ bin/
 obj/
 .vs/
 *.user
+*.Backup.tmp
+
+# Exported user media (photos / voice pulled from the DB) - local only
+media-export/
 
 # Secrets (Gmail app password, Razorpay keys) - never commit
 AurSil.Api/appsettings.Development.json

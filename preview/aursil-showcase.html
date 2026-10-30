@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AurSil UI Showcase</title>
+<style>
+  :root { --navy:#0B1F3A; --navy2:#16305A; --navy3:#071427; --gold:#F5B82E; --goldd:#C9921A; --silver:#C0C7D1; --bg:#F4F6FA; --muted:#6B7280; --up:#16A34A; --down:#DC2626; --line:#EEF1F6; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; }
+  body { width:1720px; margin:0 auto; background:#E6E9F0; font-family:Roboto,"Segoe UI",Arial,sans-serif; color:var(--navy); padding:0 0 80px; user-select:none; }
+  * { pointer-events:none; }
+  html, body { pointer-events:auto; }
+
+  /* page header */
+  .hero { background:var(--navy); color:#fff; padding:70px 80px 80px; display:flex; align-items:center; gap:34px; }
+  .hero h1 { margin:0; font-size:56px; letter-spacing:-1px; }
+  .hero p { margin:10px 0 0; color:#AEB8CC; font-size:20px; max-width:900px; line-height:1.5; }
+  .hero .chips { margin-top:22px; display:flex; gap:10px; }
+  .hero .chip { border:1px solid #2A4470; border-radius:99px; padding:7px 16px; font-size:14px; color:#D6DDEA; }
+  .a { color:var(--gold); } .s { color:var(--silver); }
+
+  .section { padding:70px 80px 10px; }
+  .section h2 { margin:0; font-size:34px; }
+  .section .lead { margin:8px 0 40px; color:var(--muted); font-size:17px; }
+  .row { display:flex; gap:56px; }
+  .shot { width:350px; flex:none; }
+  .shot .cap { margin-top:18px; font-weight:700; font-size:17px; }
+  .shot .cap small { display:block; font-weight:400; color:var(--muted); font-size:14px; margin-top:4px; line-height:1.4; }
+
+  /* phone */
+  .phone { width:350px; height:740px; background:#101114; border-radius:44px; padding:11px; box-shadow:0 30px 60px rgba(11,31,58,.28); }
+  .screen { width:100%; height:100%; border-radius:34px; overflow:hidden; position:relative; background:var(--bg); font-size:14px; }
+  .status { height:30px; display:flex; justify-content:space-between; align-items:center; padding:0 22px; font-size:12px; font-weight:700; }
+  .dark { background:var(--navy); color:#fff; }
+  .body { position:absolute; top:30px; left:0; right:0; bottom:0; overflow:hidden; }
+  .tabbed .body { bottom:60px; }
+
+  /* shared bits */
+  .logo { width:40px; height:40px; }
+  .brand { font-weight:700; font-size:18px; }
+  .tag { color:#AEB8CC; font-size:12px; }
+  .wrap { padding:14px 16px; }
+  .top { display:flex; align-items:center; gap:10px; }
+  .hdr { background:var(--navy); color:#fff; padding:22px 20px 56px; position:relative; }
+  .hdr h1 { margin:0; font-size:21px; } .hdr p { margin:4px 0 0; color:#AEB8CC; font-size:12px; }
+  .hdr.back { padding-left:52px; } .hdr.back::before { content:"‹"; position:absolute; left:20px; top:14px; font-size:30px; }
+  .card { background:#fff; margin:-36px 16px 14px; border-radius:18px; padding:18px; box-shadow:0 6px 18px rgba(0,0,0,.1); position:relative; }
+  .card h2 { margin:0; font-size:21px; } .card .sub { color:var(--muted); font-size:13px; margin:4px 0 6px; }
+  label { display:block; font-size:12px; color:var(--muted); margin:12px 0 4px 4px; }
+  .field { display:flex; align-items:center; border:1px solid #D7DCE5; border-radius:12px; height:46px; padding:0 12px; background:#fff; color:#9CA3AF; font-size:14px; gap:8px; }
+  .field.on { border-color:var(--gold); color:var(--navy); }
+  .field b { color:var(--navy); font-weight:400; }
+  .btn { height:48px; border-radius:12px; background:var(--gold); color:var(--navy); font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:center; margin-top:16px; }
+  .btn.ghost { background:#fff; border:1px solid #D7DCE5; }
+  .btn.red { background:#fff; border:1px solid #F3C4C4; color:#D32F2F; }
+  .muted { color:var(--muted); }
+  .wcard { background:#fff; border-radius:16px; padding:14px; margin-bottom:12px; color:var(--navy); }
+  .ncard { background:var(--navy2); border-radius:16px; padding:14px; margin-bottom:12px; color:#fff; }
+  h3 { margin:0 0 10px; font-size:15px; }
+  .up { color:var(--up); } .down { color:var(--down); }
+  .between { display:flex; justify-content:space-between; align-items:center; }
+
+  /* bottom tabs */
+  .nav { position:absolute; left:0; right:0; bottom:0; height:60px; background:#fff; border-top:1px solid #E5E7EB; display:flex; }
+  .nav div { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:11px; color:#9CA3AF; gap:2px; }
+  .nav div b { font-size:18px; filter:grayscale(1); opacity:.6; }
+  .nav div.on { color:var(--navy); font-weight:700; } .nav div.on b { filter:none; opacity:1; }
+  .nav.dk { background:var(--navy3); border-top:1px solid #1E3560; } .nav.dk div.on { color:var(--gold); }
+
+  /* home */
+  .offer { background:linear-gradient(135deg,#FFE7A3,#F5B82E); color:var(--navy); border-radius:14px; padding:12px 14px; margin:12px 0; position:relative; overflow:hidden; }
+  .offer::after { content:"🎉"; position:absolute; right:10px; top:8px; font-size:28px; opacity:.85; }
+  .offer b { display:block; font-size:14px; } .offer span { font-size:12px; display:block; margin-top:3px; padding-right:40px; } .offer i { font-style:normal; font-size:10px; font-weight:700; opacity:.7; display:block; margin-top:6px; }
+  .pf { background:linear-gradient(135deg,#FFD86B,#C9921A); color:var(--navy); border-radius:16px; padding:16px; margin:0 0 12px; }
+  .pf .v { font-size:25px; font-weight:700; margin:4px 0; }
+  .metals { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .m { border-radius:14px; height:128px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:8px 4px; text-align:center; position:relative; }
+  .m .sym { font-size:24px; font-weight:700; flex:1; display:flex; align-items:center; } .m .nm { font-weight:700; font-size:14px; } .m .rt { font-weight:700; font-size:11px; } .m .si { font-size:10px; }
+  .m .off { position:absolute; top:6px; right:6px; background:#D32F2F; color:#fff; font-size:9px; font-weight:700; padding:2px 6px; border-radius:99px; }
+  .g { background:linear-gradient(135deg,#FFD86B,#C9921A); color:#fff; }
+  .sv { background:linear-gradient(135deg,#E6EAF0,#8E98A6); color:var(--navy); }
+  .pt { background:linear-gradient(135deg,#DDE3EA,#6E7C8E); color:#fff; }
+  .chart { height:120px; margin-top:6px; }
+  .seg { display:flex; gap:6px; margin-bottom:6px; } .seg span { font-size:11px; padding:4px 10px; border-radius:99px; background:#22FFFFFF; background:rgba(255,255,255,.13); }
+  .seg span.on { background:var(--gold); color:var(--navy); font-weight:700; }
+
+  /* market list */
+  .mk { display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); }
+  .mk:last-child { border:0; }
+  .dot { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; flex:none; }
+  .mk .info { flex:1; } .mk .info b { display:block; } .mk .info small { color:var(--muted); font-size:11px; }
+  .mk .px { text-align:right; } .mk .px b { display:block; } .mk .px small { font-size:11px; }
+
+  /* buy */
+  .mode { display:flex; background:#EEF1F6; border-radius:10px; padding:3px; margin-bottom:12px; }
+  .mode span { flex:1; text-align:center; padding:8px; border-radius:8px; font-size:13px; }
+  .mode span.on { background:var(--navy); color:#fff; font-weight:700; }
+  .amount { font-size:30px; font-weight:700; border-bottom:2px solid var(--gold); padding:4px 0 6px; }
+  .quick { display:flex; gap:6px; margin-top:10px; } .quick span { flex:1; text-align:center; border:1px solid #D7DCE5; border-radius:99px; padding:6px 0; font-size:12px; }
+  .quick span.on { border-color:var(--gold); background:#FFF6DF; font-weight:700; }
+  .kv { display:flex; justify-content:space-between; padding:6px 0; font-size:13px; } .kv span:first-child { color:var(--muted); }
+  .kv.save span { color:#15803D !important; font-weight:700; }
+  .kv.total { border-top:1px dashed #D7DCE5; margin-top:6px; padding-top:10px; font-size:16px; font-weight:700; } .kv.total span:first-child { color:var(--navy); }
+
+  /* portfolio */
+  .hold { display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid var(--line); }
+  .hold:last-child { border:0; }
+  .bar { height:8px; border-radius:99px; overflow:hidden; display:flex; margin:10px 0 4px; }
+  .legend { display:flex; gap:12px; font-size:11px; color:var(--muted); } .legend i { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:4px; }
+
+  /* profile */
+  .avatar { width:68px; height:68px; border-radius:50%; background:linear-gradient(135deg,#FFD86B,#C9921A); color:var(--navy); font-size:30px; font-weight:700; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; }
+  .menu { display:flex; align-items:center; gap:12px; padding:13px 16px; border-bottom:1px solid var(--line); }
+  .menu:last-child { border:0; } .menu .ic { font-size:18px; } .menu .t { flex:1; } .menu .t b { display:block; font-size:14px; } .menu .t small { color:var(--muted); font-size:11px; }
+  .menu .ch { color:#9CA3AF; font-size:20px; }
+  .rules { font-size:11px; color:var(--muted); margin-top:10px; line-height:1.8; } .rules .okk { color:#15803D; }
+
+  /* admin */
+  .tiles { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+  .tile { background:var(--navy2); border-radius:12px; padding:10px; } .tile small { color:#AEB8CC; font-size:10px; display:block; } .tile b { font-size:15px; }
+  .acard { background:#fff; border-radius:16px; padding:14px; margin-bottom:10px; }
+  .acard .hd { display:flex; align-items:center; gap:10px; }
+  .acard .hd .t { flex:1; } .acard .hd .t b { display:block; font-size:15px; } .acard .hd .t small { color:var(--muted); font-size:11px; }
+  .pill { font-size:10px; font-weight:700; padding:3px 9px; border-radius:99px; }
+  .pill.ok { background:#DCFCE7; color:#15803D; } .pill.low { background:#FEF3C7; color:#B45309; } .pill.off { background:#F3F4F6; color:#6B7280; }
+  .big { font-size:24px; font-weight:700; margin:8px 0 2px; }
+  .meter { height:6px; background:#EEF1F6; border-radius:99px; overflow:hidden; margin:8px 0; } .meter i { display:block; height:100%; border-radius:99px; }
+  .mini { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); }
+  .abtn { margin-top:10px; height:36px; border-radius:10px; border:1px solid #D7DCE5; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; }
+  .area { border:1px solid #D7DCE5; border-radius:12px; padding:10px 12px; height:66px; font-size:13px; color:var(--navy); background:#fff; line-height:1.4; }
+  .switch { width:40px; height:22px; border-radius:99px; background:#D1D5DB; position:relative; flex:none; } .switch::after { content:""; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#fff; }
+  .switch.on { background:var(--up); } .switch.on::after { left:21px; }
+  .log { display:flex; gap:10px; padding:10px 12px; background:#fff; border-radius:12px; margin-bottom:6px; align-items:flex-start; }
+  .log .tm { font-size:11px; color:var(--muted); width:52px; flex:none; padding-top:2px; }
+  .log .c { flex:1; min-width:0; } .log .c b { font-size:12px; } .log .c small { display:block; color:var(--muted); font-size:11px; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .log .who { font-size:11px; font-weight:700; color:var(--navy); }
+  .ab { font-size:10px; font-weight:700; padding:2px 7px; border-radius:6px; color:#fff; margin-right:4px; }
+
+  /* splash */
+  .splash { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; text-align:center; }
+  .spin { width:28px; height:28px; border:3px solid rgba(255,255,255,.13); border-top-color:var(--gold); border-radius:50%; margin:46px auto 10px; }
+
+  .foot { text-align:center; color:var(--muted); font-size:14px; padding:70px 0 0; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD86B"/><stop offset="1" stop-color="#C9921A"/></linearGradient>
+    <linearGradient id="ls" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F1F4F8"/><stop offset="1" stop-color="#9AA4B2"/></linearGradient>
+    <symbol id="mark" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="url(#lg)" stroke-width="5"/>
+      <path d="M50 20 L74 74 H62 L50 46 L38 74 H26 Z" fill="url(#lg)"/>
+      <path d="M41 62 H59 L56 70 H44 Z" fill="url(#ls)"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="hero">
+  <svg width="120" height="120"><use href="#mark"/></svg>
+  <div>
+    <h1><span class="a">Aur</span><span class="s">Sil</span> — UI Showcase</h1>
+    <p>A digital gold, silver &amp; platinum app. Buy and sell precious metals at live prices with GST-inclusive checkout, track your holdings, and run the store from a dedicated admin console.</p>
+    <div class="chips"><span class="chip">Android · .NET MAUI</span><span class="chip">Live metal prices</span><span class="chip">Razorpay checkout</span><span class="chip">Admin console</span></div>
+  </div>
+</header>
+
+<!-- ============ ONBOARDING ============ -->
+<section class="section">
+  <h2>Getting started</h2>
+  <p class="lead">Brand splash, secure sign-in with email OTP verification, and password rules shown up front.</p>
+  <div class="row">
+
+    <div class="shot">
+      <div class="phone"><div class="screen dark">
+        <div class="status"><span>9:41</span><span>▮▮▮ 100%</span></div>
+        <div class="body"><div class="splash">
+          <svg width="130" height="130"><use href="#mark"/></svg>
+          <div class="brand" style="font-size:34px;margin-top:18px"><span class="a">Aur</span><span class="s">Sil</span></div>
+          <div class="tag" style="font-size:14px;margin-top:6px">Digital Gold · Silver · Platinum</div>
+          <div class="spin"></div>
+          <div class="tag">Loading live prices…</div>
+        </div></div>
+      </div></div>
+      <div class="cap">Splash<small>Animated brand mark while the session and live prices load.</small></div>
+    </div>
+
+    <div class="shot">
+      <div class="phone"><div class="screen">
+        <div class="status dark"><span>9:41</span><span>▮▮▮ 100%</span></div>
+        <div class="body">
+          <div class="hdr" style="text-align:center;padding-top:26px">
+            <svg width="58" height="58"><use href="#mark"/></svg>
+            <div class="brand" style="font-size:24px;margin-top:6px"><span class="a">Aur</span><span class="s">Sil</span></div>
+            <p>Invest in precious metals, the smart way</p>
+          </div>
+          <div class="card">
+            <h2>Welcome back</h2><div class="sub">Log in to continue</div>
+            <label>User ID or Email</label><div class="field on">👤 <b>priya_s</b></div>
+            <label>Password</label><div class="field">🔒 <b>••••••••••</b><span style="margin-left:auto">👁</span></div>
+            <div style="text-align:right;margin-top:10px;color:var(--goldd);font-weight:700;font-size:13px">Forgot password?</div>
+            <div class="btn">Login</div>
+            <div style="text-align:center;margin-top:16px;color:var(--muted);font-size:13px">New to AurSil? <b style="color:var(--goldd)">Create account</b></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="cap">Login<small>One screen for customers and admins — the role decides where you land.</small></div>
+    </div>
+
+    <div class="shot">
+      <div class="phone"><div class="screen">
+        <div class="status dark"><span>9:41</span><span>▮▮▮ 100%</span></div>
+        <div class="body">
+          <div class="hdr back"><h1>Verify Email</h1><p>We sent a 6-digit code to priya@example.com</p></div>
+          <div class="card">
+            <h2>Enter OTP</h2><div class="sub">The code expires in 10 minutes</div>
+            <div style="display:flex;gap:8px;margin:18px 0 4px">
+              <div class="field on" style="flex:1;justify-content:center;font-size:20px;font-weight:700;padding:0"><b>4</b></div>
+              <div class="field on" style="flex:1;justify-content:center;font-size:20px;font-weight:700;padding:0"><b>8</b></div>
+              <div class="field on" style="flex:1;justify-content:center;font-size:20px;font-weight:700;padding:0"><b>2</b></div>
+              <div class="field on" style="flex:1;justify-content:center;font-size:20px;font-weight:700;padding:0"><b>9</b></div>
+              <div class="field" style="flex:1;padding:0"></div>
+              <div class="field" style="flex:1;padding:0"></div>
+            </div>
+            <div class="btn">Verify &amp; Continue</div>
+            <div style="text-align:center;margin-top:16px;color:var(--muted);font-size:13px">Didn't get it? <b style="color:var(--goldd)">Resend in 0:42</b></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="cap">Email OTP<small>New accounts verify their email before the first login.</small></div>
+    </div>
+
+    <div class="shot">
+      <div class="phone"><div class="screen">
+        <div class="status dark"><span>9:41</span><span>▮▮▮ 100%</span></div>
+        <div class="body">
+          <div class="hdr back"><h1>Change Password</h1><p>Keep your account secure</p></div>
+          <div class="card">
+            <label>Current password</label><div class="field">🔒 <b>••••••••••</b></div>
+            <label>New password</label><div class="field on">🔑 <b>••••••••••••</b></div>
+            <label>Confirm new password</label><div class="field">🔑 <b>••••••••••••</b></div>
+            <div class="rules">
+              <div class="okk">✓ At least 8 characters</div>
+              <div class="okk">✓ An uppercase and a lowercase letter</div>
+              <div class="okk">✓ A number</div>
+              <div class="okk">✓ A special character</div>
+            </div>
+            <div class="btn">Update Password</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="cap">Change password<small>Live rule checklist; every change is recorded in the admin log.</small></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ CUSTOMER ============ -->
+<section class="section">
+  <h2>Customer app</h2>
+  <p class="lead">Live rates, admin offers and per-metal discounts flow straight to every user's home screen.</p>
+  <div class="row">
+
+    <!-- HOME -->
+    <div class="shot">
+      <div class="phone"><div class="screen dark tabbed">
+        <div class="status"><span>9:41</span><span>▮▮▮ 100%</span></div>
+        <div class="body"><div class="wrap">
+          <div class="top">
+            <svg class="logo"><use href="#mark"/></svg>
+            <div style="flex:1"><div class="brand"><span class="a">Aur</span><span class="s">Sil</span></div><div class="tag">Welcome, Priya!</div></div>
+            <span style="font-size:10px;font-weight:700;color:var(--up);background:rgba(22,163,74,.15);padding:4px 8px;border-radius:99px">● LIVE • 09:41 AM</span>
+          </div>
+          <div class="offer"><b>Festive Gold Offer</b><span>Flat 5% off on every gram of gold this Diwali week.</span><i>VALID 7 MORE DAYS</i></div>
+          <div class="pf">
+            <div style="font-size:12px;font-weight:700">MY PORTFOLIO</div>
+            <div class="v">₹1,24,860.40</div>
+            <div class="between" style="font-size:12px"><span>Invested ₹1,18,200.00</span><b style="color:#0F5F2A">+₹6,660.40 (5.63%)</b></div>
+          </div>
+          <div class="metals">
+            <div class="m g"><span class="off">5% OFF</span><div class="sym">Au</div><div class="nm">Gold</div><div class="rt">₹12,649.32/g</div><div class="si up" style="color:#fff">▲ 0.84%</div></div>
+            <div class="m sv"><div class="sym">Ag</div><div class="nm">Silver</div><div class="rt">₹168.45/g</div><div class="si" style="color:#0F5F2A">▲ 1.12%</div></div>
+            <div class="m pt"><div class="sym">Pt</div><div class="nm">Platinum</div><div class="rt">₹3,482.10/g</div><div class="si" style="color:#FFD5D5">▼ 0.36%</div></div>
+          </div>
+          <div class="ncard" style="margin-top:12px;padding:12px">
+            <div class="seg"><span class="on">1D</span><span>1W</span><span>1M</span><span>1Y</span><span style="margin-left:auto;background:none;color:var(--gold);font-weight:700">Gold</span></div>
+            <svg class="chart" width="100%" viewBox="0 0 300 100" preserveAspectRatio="none">
+              <defs><linearGradient id="cf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F5B82E" stop-opacity=".35"/><stop offset="1" stop-color="#F5B82E" stop-opacity="0"/></linearGradient></defs>
+              <path d="M0 70 L20 66 L40 72 L60 60 L80 63 L100 52 L120 56 L140 44 L160 48 L180 38 L200 42 L220 30 L240 35 L260 24 L280 28 L300 18 L300 100 L0 100 Z" fill="url(#cf)"/>
+              <path d="M0 70 L20 66 L40 72 L60 60 L80 63 L100 52 L120 56 L140 44 L160 48 L180 38 L200 42 L220 30 L240 35 L260 24 L280 28 L300 18" fill="none" stroke="#F5B82E" stroke-width="2.5"/>
+            </svg>
+          </div>
+        </div></div>
+        <div class="nav dk"><div class="on"><b>🏠</b>Home</div><div><b>📈</b>Market</div><div><b>💼</b>Portfolio</div><div><b>👤</b>Profile</div></div>
+      </div></div>
+      <div class="cap">Home<small>Offer banner, "% OFF" badges and discounted rates set by the admin.</small></div>
+    </div>
+
+    <!-- MARKET -->
+    <div class="shot">
+      <div class="phone"><div class="screen tabbed">
+        <div class="status dark"><span>9:41</span><span>▮▮▮ 100%</span></div>
+        <div class="body">
+          <div class="hdr" style="padding-bottom:50px"><h1>Market</h1><p>Live rates per gram · excl. 3% GST</p></div>
+          <div class="card" style="padding:6px 16px">
+            <div class="mk"><div class="dot g">Au</div><div class="info"><b>Gold 24K</b><small>99.9% purity</small></div><div class="px"><b>₹13,315.07</b><small class="up">▲ 0.84%</small></div></div>
+            <div class="mk"><div class="dot sv">Ag</div><div class="info"><b>Silver</b><small>99.9% purity</small></div><div class="px"><b>₹168.45</b><small class="up">▲ 1.12%</small></div></div>
+            <div class="mk"><div class="dot pt">Pt</div><div class="info"><b>Platinum</b><small>99.95% purity</small></div><div class="px"><b>₹3,482.10</b><small class="down">▼ 0.36%</small></div></div>
+          </div>
+          <div class="wrap" style="padding-top:0">
+            <div class="wcard">
+              <h3>Buy vs sell spread</h3>
+              <div class="kv"><span>Gold · Buy</span><b>₹13,315.07</b></div>
+              <div class="kv"><span>Gold · Sell</span><b>₹12,982.19</b></div>
+              <div class="kv"><span>Silver · Buy</span><b>₹168.45</b></div>
+              <div class="kv"><span>Silver · Sell</span><b>₹162.62</b></div>
+              <div class="kv"><span>Platinum · Buy</span><b>₹3,482.10</b></div>
+              <div class="kv"><span>Platinum · Sell</span><b>₹3,377.64</b></div>
+            </div>
+            <div class="muted" style="font-size:11px;text-align:center">Prices refresh every 30 seconds · gold-api.com</div>
+          </div>
+        </div>
+        <div class="nav"><div><b>🏠</b>Home</div><div class="on"><b>📈</b>Market</div><div><b>💼</b>Portfolio</div><div><b>👤</b>Profile</div></div>
+      </div></div>
+      <div class="cap">Market<small>Buy and sell rates for every metal with 24-hour change.</small></div>
+    </div>
+
+    <!-- BUY -->
+    <div class="shot">
+      <div class="phone"><div class="screen">
+        <div class="status" style="background:#D9A23A;color:#fff"><span>9:41</span><span>▮▮▮ 100%</span></div>
+        <div class="body">
+          <div class="hdr back" style="background:linear-gradient(135deg,#FFD86B,#C9921A);color:var(--navy)"><h1>Buy Gold</h1><p style="color:#5B4310">Live price • updated 09:41 AM • 5% OFF applied</p>
+            <div style="font-size:26px;font-weight:700;margin-top:8px">₹12,649.32 / g</div></div>
+          <div class="card">
+            <div class="mode"><span class="on">In Rupees</span><span>In Grams</span></div>
+            <div class="muted" style="font-size:12px">Amount to invest</div>
+            <div class="amount">₹ 10,000</div>
+            <div class="quick"><span>₹500</span><span>₹1,000</span><span>₹2,000</span><span class="on">₹5,000</span></div>
+            <div style="margin-top:14px;background:#FFF6DF;border-radius:10px;padding:10px;text-align:center;font-size:13px">You get <b>0.7676 g Gold</b></div>
+            <div style="margin-top:8px">
+              <div class="kv"><span>Rate</span><b>₹12,649.32 (5% off)</b></div>
+              <div class="kv"><span>Metal value</span><b>₹10,220.47</b></div>
+              <div class="kv save"><span>Offer discount (5%)</span><span>- ₹511.06</span></div>
+              <div class="kv"><span>GST (3%)</span><b>₹291.26</b></div>
+              <div class="kv total"><span>Total</span><span>₹10,000.00</span></div>
+            </div>
+            <div class="btn">Proceed to Pay ₹10,000.00</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="cap">Buy<small>Buy by rupees or grams; the discount line shows what the offer saves.</small></div>
+    </div>
+
+    <!-- PORTFOLIO -->
+    <div class="shot">
+      <div class="phone"><div class="screen tabbed">
+        <div class="status dark"><span>9:41</span><span>▮▮▮ 100%</span></div>
+        <div class="body">
+          <div class="hdr" style="padding-bottom:50px"><h1>Portfolio</h1><p>Your vault, valued at live sell rates</p></div>
+          <div class="card">
+            <div class="muted" style="font-size:12px">Current value</div>
+            <div style="font-size:27px;font-weight:700;margin:2px 0">₹1,24,860.40</div>
+            <div class="between" style="font-size:12px"><span class="muted">Invested ₹1,18,200.00</span><b class="up">+₹6,660.40 (5.63%)</b></div>
+            <div class="bar"><i style="width:72%;background:#E0A92B"></i><i style="width:18%;background:#A3ACB9"></i><i style="width:10%;background:#6E7C8E"></i></div>
+            <div class="legend"><span><i style="background:#E0A92B"></i>Gold 72%</span><span><i style="background:#A3ACB9"></i>Silver 18%</span><span><i style="background:#6E7C8E"></i>Platinum 10%</span></div>
+          </div>
+          <div class="wrap" style="padding-top:0">
+            <div class="wcard" style="padding:4px 14px">
+              <div class="hold"><div class="dot g">Au</div><div style="flex:1"><b>Gold</b><div class="muted" style="font-size:11px">6.9150 g</div></div><div style="text-align:right"><b>₹89,771.85</b><div class="up" style="font-size:11px">+4.9%</div></div></div>
+              <div class="hold"><div class="dot sv">Ag</div><div style="flex:1"><b>Silver</b><div class="muted" style="font-size:11px">138.20 g</div></div><div style="text-align:right"><b>₹22,474.08</b><div class="up" style="font-size:11px">+9.2%</div></div></div>
+              <div class="hold"><div class="dot pt">Pt</div><div style="flex:1"><b>Platinum</b><div class="muted" style="font-size:11px">3.7346 g</div></div><div style="text-align:right"><b>₹12,614.47</b><div class="down" style="font-size:11px">-1.4%</div></div></div>
+            </div>
+            <div style="display:flex;gap:10px"><div class="btn" style="flex:1;margin:0">Buy more</div><div class="btn ghost" style="flex:1;margin:0">Sell</div></div>
+          </div>
+        </div>
+        <div class="nav"><div><b>🏠</b>Home</div><div><b>📈</b>Market</div><div class="on"><b>💼</b>Portfolio</div><div><b>👤</b>Profile</div></div>
+      </div></div>
+      <div class="cap">Portfolio<small>Holdings, allocation and profit or loss at a glance.</small></div>
+    </div>
+
+  </div>
+
+  <div class="row" style="margin-top:60px">
+
+    <!-- PAYMENT RESULT -->
+    <div class="shot">
+      <div class="phone"><div class="screen">
+        <div class="status"><span>9:42</span><span>▮▮▮ 100%</span></div>
+        <div class="body" style="display:flex;flex-direction:column;align-items:center;padding:60px 22px 0;text-align:center">
+          <div style="width:96px;height:96px;border-radius:50%;background:#DCFCE7;display:flex;align-items:center;justify-content:center;font-size:46px;color:var(--up)">✓</div>
+          <h2 style="margin:22px 0 4px;font-size:23px">Payment successful</h2>
+          <div class="muted">0.7676 g Gold added to your vault</div>
+          <div class="wcard" style="width:100%;margin-top:26px;text-align:left">
+            <div class="kv"><span>Order no.</span><b>AS2610280917</b></div>
+            <div class="kv"><span>Metal</span><b>Gold 24K</b></div>
+            <div class="kv"><span>Quantity</span><b>0.7676 g</b></div>
+            <div class="kv save"><span>You saved</span><span>₹511.06</span></div>
+            <div class="kv total"><span>Paid</span><span>₹10,000.00</span></div>
+          </div>
+          <div class="muted" style="font-size:11px">Paid via Razorpay · UPI</div>
+          <div class="btn" style="width:100%;margin-top:22px">Go to Portfolio</div>
+          <div class="btn ghost" style="width:100%;margin-top:10px">Back to Home</div>
+        </div>
+      </div></div>
+      <div class="cap">Payment result<small>Razorpay checkout returns to a clear receipt.</small></div>
+    </div>
+
+    <!-- TRANSACTIONS -->
+    <div class="shot">
+      <div class="phone"><div class="screen">
+        <div class="status dark"><span>9:41</span><span>▮▮▮ 100%</span></div>
+        <div class="body">
+          <div class="hdr back" style="padding-bottom:50px"><h1>Transactions</h1><p>All your buys and sells</p></div>
+          <div class="card" style="padding:4px 16px">
+            <div class="hold"><div class="dot g">Au</div><div style="flex:1"><b>Bought Gold</b><div class="muted" style="font-size:11px">28 Oct · 0.7676 g</div></div><div style="text-align:right"><b>₹10,000.00</b><div class="up" style="font-size:11px">Completed</div></div></div>
+            <div class="hold"><div class="dot sv">Ag</div><div style="flex:1"><b>Sold Silver</b><div class="muted" style="font-size:11px">26 Oct · 40.00 g</div></div><div style="text-align:right"><b>₹6,504.80</b><div class="up" style="font-size:11px">Credited</div></div></div>
+            <div class="hold"><div class="dot pt">Pt</div><div style="flex:1"><b>Bought Platinum</b><div class="muted" style="font-size:11px">22 Oct · 1.2000 g</div></div><div style="text-align:right"><b>₹4,303.87</b><div class="up" style="font-size:11px">Completed</div></div></div>
+            <div class="hold"><div class="dot g">Au</div><div style="flex:1"><b>Bought Gold</b><div class="muted" style="font-size:11px">19 Oct · 2.0000 g</div></div><div style="text-align:right"><b>₹27,428.69</b><div class="down" style="font-size:11px">Cancelled</div></div></div>
+            <div class="hold"><div class="dot sv">Ag</div><div style="flex:1"><b>Bought Silver</b><div class="muted" style="font-size:11px">15 Oct · 100.00 g</div></div><div style="text-align:right"><b>₹17,350.35</b><div class="up" style="font-size:11px">Completed</div></div></div>
+            <div class="hold"><div class="dot g">Au</div><div style="flex:1"><b>Bought Gold</b><div class="muted" style="font-size:11px">08 Oct · 5.0000 g</div></div><div style="text-align:right"><b>₹68,571.61</b><div class="up" style="font-size:11px">Completed</div></div></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="cap">Transactions<small>Every order with its status, newest first.</small></div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="shot">
+      <div class="phone"><div class="screen tabbed">
+        <div class="status dark"><span>9:41</span><span>▮▮▮ 100%</span></div>
+        <div class="body">
+          <div class="hdr" style="text-align:center;padding:22px 20px 56px"><div class="avatar">P</div><h1>Priya Sharma</h1><p>@priya_s</p></div>
+          <div class="card" style="padding:0">
+            <div class="menu"><span class="ic">✉️</span><div class="t"><small>Email</small><b>priya@example.com</b></div></div>
+            <div class="menu"><span class="ic">📱</span><div class="t"><small>Mobile</small><b>98765 43210</b></div></div>
+            <div class="menu"><span class="ic">✅</span><div class="t"><small>Account status</small><b style="color:#15803D">Active</b></div></div>
+          </div>
+          <div class="wcard" style="margin:0 16px 12px;padding:0">
+            <div class="menu"><span class="ic">🏦</span><div class="t"><b>Bank Account</b><small>HDFC Bank ••••4821</small></div><span class="ch">›</span></div>
+            <div class="menu"><span class="ic">🧾</span><div class="t"><b>Transactions</b></div><span class="ch">›</span></div>
+            <div class="menu"><span class="ic">🔑</span><div class="t"><b>Change Password</b></div><span class="ch">›</span></div>
+          </div>
+          <div class="btn red" style="margin:0 16px">Logout</div>
+        </div>
+        <div class="nav"><div><b>🏠</b>Home</div><div><b>📈</b>Market</div><div><b>💼</b>Portfolio</div><div class="on"><b>👤</b>Profile</div></div>
+      </div></div>
+      <div class="cap">Profile<small>Account details, bank account for payouts and security.</small></div>
+    </div>
+
+    <!-- SELL -->
+    <div class="shot">
+      <div class="phone"><div class="screen">
+        <div class="status dark"><span>9:41</span><span>▮▮▮ 100%</span></div>
+        <div class="body">
+          <div class="hdr back"><h1>Sell Silver</h1><p>Sell rate ₹162.62 / g · you hold 138.20 g</p></div>
+          <div class="card">
+            <div class="mode"><span>In Rupees</span><span class="on">In Grams</span></div>
+            <div class="muted" style="font-size:12px">Grams to sell</div>
+            <div class="amount">40.00 g</div>
+            <div class="quick"><span>10 g</span><span class="on">40 g</span><span>100 g</span><span>All</span></div>
+            <div style="margin-top:14px;background:#EEF1F6;border-radius:10px;padding:10px;text-align:center;font-size:13px">You receive <b>₹6,504.80</b></div>
+            <div style="margin-top:8px">
+              <div class="kv"><span>Sell rate</span><b>₹162.62 / g</b></div>
+              <div class="kv"><span>Quantity</span><b>40.00 g</b></div>
+              <div class="kv"><span>Credited to</span><b>HDFC ••••4821</b></div>
+              <div class="kv total"><span>Payout</span><span>₹6,504.80</span></div>
+            </div>
+            <div class="btn" style="background:var(--navy);color:#fff">Sell 40.00 g Silver</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="cap">Sell<small>Instant payout quote straight to the saved bank account.</small></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ ADMIN ============ -->
+<section class="section">
+  <h2>Admin console</h2>
+  <p class="lead">Logging in with admin credentials opens a separate console: vault stock, offers, discounts and a daily activity log.</p>
+  <div class="row">
+
+    <!-- STOCK -->
+    <div class="shot">
+      <div class="phone"><div class="screen tabbed">
+        <div class="status dark"><span>9:41</span><span>▮▮▮ 100%</span></div>
+        <div class="body">
+          <div class="dark" style="padding:14px 16px 16px">
+            <div class="top"><svg class="logo"><use href="#mark"/></svg><div style="flex:1"><div class="brand">Admin Console</div><div class="tag">Vault stock · live</div></div><span style="font-size:20px">⋮</span></div>
+            <div class="tiles">
+              <div class="tile"><small>Stock value</small><b>₹2,23,50,912</b></div>
+              <div class="tile"><small>Customer holdings</small><b>₹8,42,317</b></div>
+              <div class="tile"><small>Orders today</small><b>14</b></div>
+              <div class="tile"><small>Users</small><b>238</b></div>
+            </div>
+          </div>
+          <div class="wrap">
+            <div class="acard">
+              <div class="hd"><div class="dot g">Au</div><div class="t"><b>Gold</b><small>Updated 09:12 AM</small></div><span class="pill ok">IN STOCK</span></div>
+              <div class="big">999.23 g</div><div class="meter"><i style="width:82%;background:#E0A92B"></i></div>
+              <div class="mini"><span>Worth ₹1,33,04,821</span><span>Sold today 0.77 g</span></div>
+            </div>
+            <div class="acard">
+              <div class="hd"><div class="dot sv">Ag</div><div class="t"><b>Silver</b><small>Updated 08:50 AM</small></div><span class="pill ok">IN STOCK</span></div>
+              <div class="big">50,040.00 g</div><div class="meter"><i style="width:94%;background:#A3ACB9"></i></div>
+              <div class="mini"><span>Worth ₹84,29,238</span><span>Bought back 40 g</span></div>
+            </div>
+            <div class="acard">
+              <div class="hd"><div class="dot pt">Pt</div><div class="t"><b>Platinum</b><small>Updated 08:30 AM</small></div><span class="pill low">LOW</span></div>
+              <div class="big">48.60 g</div><div class="meter"><i style="width:12%;background:#D97706"></i></div>
+            </div>
+          </div>
+        </div>
+        <div class="nav dk"><div class="on"><b>⛰️</b>Stock</div><div><b>📣</b>Offers</div><div><b>🏷️</b>Discounts</div><div><b>📄</b>Activity</div></div>
+      </div></div>
+      <div class="cap">Vault stock<small>Grams of gold, silver and platinum; buys deduct and sells add back automatically.</small></div>
+    </div>
+
+    <!-- OFFERS -->
+    <div class="shot">
+      <div class="phone"><div class="screen tabbed">
+        <div class="status dark"><span>9:41</span><span>▮▮▮ 100%</span></div>
+        <div class="body">
+          <div class="hdr" style="padding-bottom:50px"><h1>Offers</h1><p>Shown on every customer's home screen</p></div>
+          <div class="card">
+            <h3>New offer</h3>
+            <div class="field on"><b>Silver Saver Weekend</b></div>
+            <div class="area" style="margin-top:8px">Buy 100 g or more of silver and get the best rate of the month.</div>
+            <div class="between" style="margin-top:10px;font-size:12px"><span class="muted">Valid for</span><span style="border:1px solid #D7DCE5;border-radius:8px;padding:5px 10px">3 days ▾</span></div>
+            <div class="btn" style="height:42px;margin-top:12px">Publish to all users</div>
+          </div>
+          <div class="wrap" style="padding-top:0">
+            <div class="acard">
+              <div class="between"><b>Festive Gold Offer</b><span class="pill ok">LIVE</span></div>
+              <div class="muted" style="font-size:12px;margin-top:4px">Flat 5% off on every gram of gold this Diwali week.</div>
+              <div class="between" style="margin-top:8px;font-size:11px"><span class="muted">Ends 04 Nov · 7 days left</span><span><b>Hide</b> &nbsp; <b style="color:#D32F2F">Delete</b></span></div>
+            </div>
+            <div class="acard">
+              <div class="between"><b>Platinum Launch</b><span class="pill off">HIDDEN</span></div>
+              <div class="muted" style="font-size:12px;margin-top:4px">Now buy platinum from just ₹500.</div>
+              <div class="between" style="margin-top:8px;font-size:11px"><span class="muted">No expiry</span><span><b>Show</b> &nbsp; <b style="color:#D32F2F">Delete</b></span></div>
+            </div>
+          </div>
+        </div>
+        <div class="nav dk"><div><b>⛰️</b>Stock</div><div class="on"><b>📣</b>Offers</div><div><b>🏷️</b>Discounts</div><div><b>📄</b>Activity</div></div>
+      </div></div>
+      <div class="cap">Offers<small>Publish, hide or expire banners that reach every user instantly.</small></div>
+    </div>
+
+    <!-- DISCOUNTS -->
+    <div class="shot">
+      <div class="phone"><div class="screen tabbed">
+        <div class="status dark"><span>9:41</span><span>▮▮▮ 100%</span></div>
+        <div class="body">
+          <div class="hdr" style="padding-bottom:50px"><h1>Discounts</h1><p>Taken off the live buy rate · 0–50%</p></div>
+          <div class="wrap" style="margin-top:-36px;position:relative">
+            <div class="acard">
+              <div class="hd"><div class="dot g">Au</div><div class="t"><b>Gold</b><small style="color:#15803D;font-weight:700">ON · customers pay ₹12,649.32/g</small></div><div class="switch on"></div></div>
+              <div style="display:flex;gap:8px;margin-top:12px"><div class="field on" style="flex:1"><b>5</b><span style="margin-left:auto">%</span></div><div class="btn" style="margin:0;width:90px;height:46px">Save</div></div>
+            </div>
+            <div class="acard">
+              <div class="hd"><div class="dot sv">Ag</div><div class="t"><b>Silver</b><small>OFF · full price</small></div><div class="switch"></div></div>
+              <div style="display:flex;gap:8px;margin-top:12px"><div class="field" style="flex:1"><b>2</b><span style="margin-left:auto">%</span></div><div class="btn ghost" style="margin:0;width:90px;height:46px">Save</div></div>
+            </div>
+            <div class="acard">
+              <div class="hd"><div class="dot pt">Pt</div><div class="t"><b>Platinum</b><small>OFF · full price</small></div><div class="switch"></div></div>
+              <div style="display:flex;gap:8px;margin-top:12px"><div class="field" style="flex:1"><b>0</b><span style="margin-left:auto">%</span></div><div class="btn ghost" style="margin:0;width:90px;height:46px">Save</div></div>
+            </div>
+            <div class="muted" style="font-size:11px;text-align:center;padding:0 10px;line-height:1.5">Active discounts show as a "% OFF" badge on the home screen and as a saving line at checkout.</div>
+          </div>
+        </div>
+        <div class="nav dk"><div><b>⛰️</b>Stock</div><div><b>📣</b>Offers</div><div class="on"><b>🏷️</b>Discounts</div><div><b>📄</b>Activity</div></div>
+      </div></div>
+      <div class="cap">Discounts<small>A percentage and an on/off switch for each metal.</small></div>
+    </div>
+
+    <!-- ACTIVITY -->
+    <div class="shot">
+      <div class="phone"><div class="screen tabbed" style="background:#EDF0F5">
+        <div class="status dark"><span>9:41</span><span>▮▮▮ 100%</span></div>
+        <div class="body">
+          <div class="dark" style="padding:14px 16px">
+            <div class="between"><div><div class="brand">Activity Log</div><div class="tag">Every user action, one file per day</div></div></div>
+            <div style="display:flex;gap:8px;margin-top:12px">
+              <div style="flex:1;background:var(--navy2);border-radius:10px;padding:10px 12px;font-size:13px">📅 28 Oct 2026</div>
+              <div style="background:var(--gold);color:var(--navy);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:700">⬇ Log file</div>
+            </div>
+            <div style="background:var(--navy2);border-radius:10px;padding:10px 12px;font-size:13px;color:#8FA0BF;margin-top:8px">🔍 Search user, action or order no.</div>
+            <div class="tag" style="margin-top:8px">42 events today</div>
+          </div>
+          <div style="padding:8px 10px">
+            <div class="log"><div class="tm">09:41:07</div><div class="c"><span class="ab" style="background:#16A34A">BUY</span><span class="who">priya_s</span><small>Paid ₹10,000.00 · 0.7676 g gold · AS2610280917</small></div></div>
+            <div class="log"><div class="tm">09:40:22</div><div class="c"><span class="ab" style="background:#2563EB">ORDER</span><span class="who">priya_s</span><small>Buy order 0.7676 g gold at 5% off</small></div></div>
+            <div class="log"><div class="tm">09:38:51</div><div class="c"><span class="ab" style="background:#0B1F3A">LOGIN</span><span class="who">priya_s</span><small>Logged in from 49.36.112.18</small></div></div>
+            <div class="log"><div class="tm">09:31:10</div><div class="c"><span class="ab" style="background:#D97706">SELL</span><span class="who">rahul_k</span><small>Sold 40.00 g silver · ₹6,504.80</small></div></div>
+            <div class="log"><div class="tm">09:24:46</div><div class="c"><span class="ab" style="background:#7C3AED">PASSWORD</span><span class="who">anita92</span><small>Changed password</small></div></div>
+            <div class="log"><div class="tm">09:20:03</div><div class="c"><span class="ab" style="background:#DC2626">FAILED</span><span class="who">vikram.r</span><small>Login failed · wrong password</small></div></div>
+            <div class="log"><div class="tm">09:12:30</div><div class="c"><span class="ab" style="background:#C9921A">STOCK</span><span class="who">admin</span><small>Gold +500 g → 1,000 g</small></div></div>
+            <div class="log"><div class="tm">09:05:12</div><div class="c"><span class="ab" style="background:#C9921A">OFFER</span><span class="who">admin</span><small>Created "Festive Gold Offer" · 7 days</small></div></div>
+          </div>
+        </div>
+        <div class="nav dk"><div><b>⛰️</b>Stock</div><div><b>📣</b>Offers</div><div><b>🏷️</b>Discounts</div><div class="on"><b>📄</b>Activity</div></div>
+      </div></div>
+      <div class="cap">Activity log<small>Logins, buys, sells and password changes, downloadable as a CSV file per day.</small></div>
+    </div>
+
+  </div>
+</section>
+
+<div class="foot"><span class="a" style="font-weight:700">Aur</span><span style="font-weight:700;color:#8E98A6">Sil</span> · UI showcase · sample data for illustration</div>
+
+</body>
+</html>

@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:AurSil.Mobile.Views"
+             xmlns:svc="clr-namespace:AurSil.Mobile.Services"
              x:Class="AurSil.Mobile.Views.HomePage"
              BackgroundColor="{StaticResource Navy}"
              Shell.NavBarIsVisible="False">
@@ -18,6 +19,16 @@
 			<Setter Property="Stroke" Value="#E5E7EB" />
 			<Setter Property="StrokeShape" Value="RoundRectangle 12" />
 			<Setter Property="Padding" Value="4,12" />
+		</Style>
+		<Style x:Key="OffBadge" TargetType="Label">
+			<Setter Property="IsVisible" Value="False" />
+			<Setter Property="BackgroundColor" Value="#DC2626" />
+			<Setter Property="TextColor" Value="White" />
+			<Setter Property="FontSize" Value="10" />
+			<Setter Property="FontAttributes" Value="Bold" />
+			<Setter Property="Padding" Value="5,1" />
+			<Setter Property="HorizontalOptions" Value="End" />
+			<Setter Property="VerticalOptions" Value="Start" />
 		</Style>
 		<Style x:Key="ChipLabel" TargetType="Label">
 			<Setter Property="FontSize" Value="13" />
@@ -57,6 +68,23 @@
 					<Label Text="Invest in your future today." TextColor="#AEB8CC" FontSize="15" />
 				</VerticalStackLayout>
 
+				<!-- Offers published by the admin -->
+				<VerticalStackLayout x:Name="OfferList" Spacing="10" IsVisible="False">
+					<BindableLayout.ItemTemplate>
+						<DataTemplate x:DataType="svc:OfferDto">
+							<Border StrokeThickness="1" Stroke="#F5B82E" StrokeShape="RoundRectangle 16" BackgroundColor="#1F3A63" Padding="14,12">
+								<Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+									<Label Text="🎁" FontSize="26" VerticalOptions="Center" />
+									<VerticalStackLayout Grid.Column="1" Spacing="2">
+										<Label Text="{Binding Title}" TextColor="{StaticResource Gold}" FontSize="15" FontAttributes="Bold" />
+										<Label Text="{Binding Message}" TextColor="White" FontSize="13" />
+									</VerticalStackLayout>
+								</Grid>
+							</Border>
+						</DataTemplate>
+					</BindableLayout.ItemTemplate>
+				</VerticalStackLayout>
+
 				<!-- Portfolio summary -->
 				<Border StrokeThickness="0" StrokeShape="RoundRectangle 18" Padding="18" Background="{StaticResource GoldBrush}">
 					<Border.GestureRecognizers>
@@ -89,6 +117,7 @@
 								<Grid RowDefinitions="*,Auto,Auto,Auto,Auto">
 									<Label Text="Au" FontSize="28" FontAttributes="Bold" TextColor="#FFF6D8" HorizontalOptions="Center" VerticalOptions="Center" />
 									<Label Grid.Row="1" Text="Gold" FontSize="16" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" />
+									<Label x:Name="GoldOff" Style="{StaticResource OffBadge}" />
 									<Label x:Name="GoldRate" Grid.Row="2" Text="--" FontSize="13" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" />
 									<Label x:Name="GoldChange" Grid.Row="3" Text="" FontSize="11" TextColor="White" HorizontalOptions="Center" />
 									<Label Grid.Row="4" Text="Buy Now ›" FontSize="11" TextColor="White" HorizontalOptions="Center" Margin="0,2,0,0" />
@@ -99,6 +128,7 @@
 								<Grid RowDefinitions="*,Auto,Auto,Auto,Auto">
 									<Label Text="Ag" FontSize="28" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" />
 									<Label Grid.Row="1" Text="Silver" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Navy}" HorizontalOptions="Center" />
+									<Label x:Name="SilverOff" Style="{StaticResource OffBadge}" />
 									<Label x:Name="SilverRate" Grid.Row="2" Text="--" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource Navy}" HorizontalOptions="Center" />
 									<Label x:Name="SilverChange" Grid.Row="3" Text="" FontSize="11" TextColor="{StaticResource Navy}" HorizontalOptions="Center" />
 									<Label Grid.Row="4" Text="Buy Now ›" FontSize="11" TextColor="{StaticResource Navy}" HorizontalOptions="Center" Margin="0,2,0,0" />
@@ -109,6 +139,7 @@
 								<Grid RowDefinitions="*,Auto,Auto,Auto,Auto">
 									<Label Text="Pt" FontSize="28" FontAttributes="Bold" TextColor="#E4DCFF" HorizontalOptions="Center" VerticalOptions="Center" />
 									<Label Grid.Row="1" Text="Platinum" FontSize="16" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" />
+									<Label x:Name="PlatinumOff" Style="{StaticResource OffBadge}" />
 									<Label x:Name="PlatinumRate" Grid.Row="2" Text="--" FontSize="13" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" />
 									<Label x:Name="PlatinumChange" Grid.Row="3" Text="" FontSize="11" TextColor="White" HorizontalOptions="Center" />
 									<Label Grid.Row="4" Text="Buy Now ›" FontSize="11" TextColor="White" HorizontalOptions="Center" Margin="0,2,0,0" />

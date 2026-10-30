@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AurSil.Mobile.Views.AdminDiscountsPage"
+             BackgroundColor="{StaticResource PageBg}"
+             Shell.NavBarIsVisible="False">
+
+	<ScrollView>
+		<VerticalStackLayout>
+			<Grid BackgroundColor="{StaticResource Navy}" Padding="20,24,20,56" ColumnDefinitions="*,Auto">
+				<VerticalStackLayout>
+					<Label Text="Discounts" TextColor="White" FontSize="24" FontAttributes="Bold" />
+					<Label Text="Percent off the live buy price, applied to every user's purchase" TextColor="#AEB8CC" FontSize="13" />
+				</VerticalStackLayout>
+				<Label Grid.Column="1" Text="⋮" TextColor="White" FontSize="28" Padding="12,0,0,0" VerticalOptions="Start">
+					<Label.GestureRecognizers><TapGestureRecognizer Tapped="OnMenuTapped" /></Label.GestureRecognizers>
+				</Label>
+			</Grid>
+
+			<VerticalStackLayout Margin="16,-36,16,24" Spacing="12">
+				<Border BackgroundColor="White" StrokeThickness="0" StrokeShape="RoundRectangle 18" Padding="16">
+					<Border.Shadow><Shadow Brush="Black" Opacity="0.08" Radius="12" Offset="0,4" /></Border.Shadow>
+					<VerticalStackLayout Spacing="12">
+						<Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+							<Border WidthRequest="44" HeightRequest="44" StrokeThickness="0" StrokeShape="RoundRectangle 22" Background="{StaticResource GoldBrush}">
+								<Label Text="Au" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" />
+							</Border>
+							<VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+								<Label Text="Gold" FontSize="17" FontAttributes="Bold" TextColor="{StaticResource Navy}" />
+								<Label x:Name="GoldState" Text="" FontSize="12" TextColor="{StaticResource TextMuted}" />
+							</VerticalStackLayout>
+							<Switch x:Name="GoldSwitch" Grid.Column="2" OnColor="{StaticResource Gold}" ThumbColor="{StaticResource Navy}" VerticalOptions="Center" />
+						</Grid>
+						<Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+							<Border Style="{StaticResource FieldBorder}">
+								<Grid ColumnDefinitions="*,Auto">
+									<Entry x:Name="GoldPercent" Placeholder="0" Keyboard="Numeric" MaxLength="5" Style="{StaticResource FieldEntry}" />
+									<Label Grid.Column="1" Text="% off" TextColor="{StaticResource TextMuted}" VerticalOptions="Center" />
+								</Grid>
+							</Border>
+							<Button Grid.Column="1" Text="Save" Style="{StaticResource GoldButton}" WidthRequest="96" Clicked="OnSaveClicked" CommandParameter="gold" />
+						</Grid>
+					</VerticalStackLayout>
+				</Border>
+				<Border BackgroundColor="White" StrokeThickness="0" StrokeShape="RoundRectangle 18" Padding="16">
+					<Border.Shadow><Shadow Brush="Black" Opacity="0.08" Radius="12" Offset="0,4" /></Border.Shadow>
+					<VerticalStackLayout Spacing="12">
+						<Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+							<Border WidthRequest="44" HeightRequest="44" StrokeThickness="0" StrokeShape="RoundRectangle 22" Background="{StaticResource SilverBrush}">
+								<Label Text="Ag" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" />
+							</Border>
+							<VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+								<Label Text="Silver" FontSize="17" FontAttributes="Bold" TextColor="{StaticResource Navy}" />
+								<Label x:Name="SilverState" Text="" FontSize="12" TextColor="{StaticResource TextMuted}" />
+							</VerticalStackLayout>
+							<Switch x:Name="SilverSwitch" Grid.Column="2" OnColor="{StaticResource Gold}" ThumbColor="{StaticResource Navy}" VerticalOptions="Center" />
+						</Grid>
+						<Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+							<Border Style="{StaticResource FieldBorder}">
+								<Grid ColumnDefinitions="*,Auto">
+									<Entry x:Name="SilverPercent" Placeholder="0" Keyboard="Numeric" MaxLength="5" Style="{StaticResource FieldEntry}" />
+									<Label Grid.Column="1" Text="% off" TextColor="{StaticResource TextMuted}" VerticalOptions="Center" />
+								</Grid>
+							</Border>
+							<Button Grid.Column="1" Text="Save" Style="{StaticResource GoldButton}" WidthRequest="96" Clicked="OnSaveClicked" CommandParameter="silver" />
+						</Grid>
+					</VerticalStackLayout>
+				</Border>
+				<Border BackgroundColor="White" StrokeThickness="0" StrokeShape="RoundRectangle 18" Padding="16">
+					<Border.Shadow><Shadow Brush="Black" Opacity="0.08" Radius="12" Offset="0,4" /></Border.Shadow>
+					<VerticalStackLayout Spacing="12">
+						<Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+							<Border WidthRequest="44" HeightRequest="44" StrokeThickness="0" StrokeShape="RoundRectangle 22" Background="{StaticResource PlatinumBrush}">
+								<Label Text="Pt" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" />
+							</Border>
+							<VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+								<Label Text="Platinum" FontSize="17" FontAttributes="Bold" TextColor="{StaticResource Navy}" />
+								<Label x:Name="PlatinumState" Text="" FontSize="12" TextColor="{StaticResource TextMuted}" />
+							</VerticalStackLayout>
+							<Switch x:Name="PlatinumSwitch" Grid.Column="2" OnColor="{StaticResource Gold}" ThumbColor="{StaticResource Navy}" VerticalOptions="Center" />
+						</Grid>
+						<Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+							<Border Style="{StaticResource FieldBorder}">
+								<Grid ColumnDefinitions="*,Auto">
+									<Entry x:Name="PlatinumPercent" Placeholder="0" Keyboard="Numeric" MaxLength="5" Style="{StaticResource FieldEntry}" />
+									<Label Grid.Column="1" Text="% off" TextColor="{StaticResource TextMuted}" VerticalOptions="Center" />
+								</Grid>
+							</Border>
+							<Button Grid.Column="1" Text="Save" Style="{StaticResource GoldButton}" WidthRequest="96" Clicked="OnSaveClicked" CommandParameter="platinum" />
+						</Grid>
+					</VerticalStackLayout>
+				</Border>
+				<Label Text="Switch a discount on and tap Save. Users see the reduced price and a % OFF badge right away; buy orders are charged at the discounted rate. Maximum 50%."
+				       FontSize="12" TextColor="{StaticResource TextMuted}" Margin="4,4,4,0" />
+			</VerticalStackLayout>
+		</VerticalStackLayout>
+	</ScrollView>
+</ContentPage>

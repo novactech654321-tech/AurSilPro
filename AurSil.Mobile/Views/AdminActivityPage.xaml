@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:svc="clr-namespace:AurSil.Mobile.Services"
+             x:Class="AurSil.Mobile.Views.AdminActivityPage"
+             BackgroundColor="{StaticResource PageBg}"
+             Shell.NavBarIsVisible="False">
+
+	<Grid RowDefinitions="Auto,*">
+		<VerticalStackLayout BackgroundColor="{StaticResource Navy}" Padding="20,24,20,16" Spacing="12">
+			<Grid ColumnDefinitions="*,Auto">
+				<VerticalStackLayout>
+					<Label Text="Activity Log" TextColor="White" FontSize="24" FontAttributes="Bold" />
+					<Label Text="Every login, purchase, sale and account change" TextColor="#AEB8CC" FontSize="13" />
+				</VerticalStackLayout>
+				<Label Grid.Column="1" Text="⋮" TextColor="White" FontSize="28" Padding="12,0,0,0" VerticalOptions="Start">
+					<Label.GestureRecognizers><TapGestureRecognizer Tapped="OnMenuTapped" /></Label.GestureRecognizers>
+				</Label>
+			</Grid>
+			<Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+				<Border BackgroundColor="White" StrokeThickness="0" StrokeShape="RoundRectangle 12" Padding="12,0" HeightRequest="46">
+					<DatePicker x:Name="DayPicker" Format="dd MMM yyyy" TextColor="{StaticResource Navy}" DateSelected="OnDateSelected" />
+				</Border>
+				<Button Grid.Column="1" Text="⬇ Log file" Style="{StaticResource GoldButton}" HeightRequest="46" Padding="16,0" Clicked="OnDownloadClicked" />
+			</Grid>
+			<Border BackgroundColor="#16305A" StrokeThickness="0" StrokeShape="RoundRectangle 12" Padding="12,0" HeightRequest="44">
+				<Entry x:Name="SearchEntry" Placeholder="Search user, action or order no." PlaceholderColor="#8A97B0" TextColor="White"
+				       BackgroundColor="Transparent" ReturnType="Search" Completed="OnSearchCompleted" />
+			</Border>
+			<Label x:Name="CountLabel" Text="" TextColor="#AEB8CC" FontSize="12" />
+		</VerticalStackLayout>
+
+		<RefreshView x:Name="Refresher" Grid.Row="1" Refreshing="OnRefreshing" RefreshColor="{StaticResource Gold}">
+			<CollectionView x:Name="LogList" Margin="12,8,12,0">
+				<CollectionView.ItemTemplate>
+					<DataTemplate x:DataType="svc:ActivityDto">
+						<Border Margin="0,0,0,8" BackgroundColor="White" StrokeThickness="0" StrokeShape="RoundRectangle 12" Padding="14,10">
+							<VerticalStackLayout Spacing="2">
+								<Grid ColumnDefinitions="*,Auto">
+									<Label Text="{Binding ActionText}" FontSize="14" FontAttributes="Bold" TextColor="{Binding ActionColor}" />
+									<Label Grid.Column="1" Text="{Binding TimeText}" FontSize="12" TextColor="#9CA3AF" />
+								</Grid>
+								<Label Text="{Binding Who}" FontSize="13" TextColor="{StaticResource Navy}" />
+								<Label Text="{Binding Details}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+								<Label Text="{Binding IpAddress, StringFormat='IP {0}'}" FontSize="10" TextColor="#B0B7C3" />
+							</VerticalStackLayout>
+						</Border>
+					</DataTemplate>
+				</CollectionView.ItemTemplate>
+				<CollectionView.EmptyView>
+					<Label Text="No activity on this day." TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" Margin="0,40" />
+				</CollectionView.EmptyView>
+			</CollectionView>
+		</RefreshView>
+	</Grid>
+</ContentPage>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:svc="clr-namespace:AurSil.Mobile.Services"
+             x:Class="AurSil.Mobile.Views.MediaPage"
+             x:DataType="{x:Null}"
+             BackgroundColor="{StaticResource PageBg}"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False">
+
+	<Grid RowDefinitions="Auto,*">
+		<Grid BackgroundColor="{StaticResource Navy}" Padding="20,28,20,24" ColumnDefinitions="Auto,*">
+			<Label Text="←" TextColor="White" FontSize="26" VerticalOptions="Start">
+				<Label.GestureRecognizers><TapGestureRecognizer Tapped="OnBackTapped" /></Label.GestureRecognizers>
+			</Label>
+			<VerticalStackLayout Grid.Column="1" Spacing="4" Margin="12,0,0,0">
+				<Label Text="Camera &amp; Voice" TextColor="White" FontSize="24" FontAttributes="Bold" />
+				<Label Text="Capture a photo or a voice note and save it to your account" TextColor="#AEB8CC" FontSize="13" />
+			</VerticalStackLayout>
+		</Grid>
+
+		<ScrollView Grid.Row="1">
+			<VerticalStackLayout Padding="20,18" Spacing="16">
+
+				<Border Padding="14" BackgroundColor="#FFF7E6" StrokeThickness="0" StrokeShape="RoundRectangle 12">
+					<Label FontSize="12" TextColor="#8A6D3B"
+					       Text="🔒 The camera and microphone are used only when you tap a button below. Android will ask your permission the first time. Nothing is captured in the background." />
+				</Border>
+
+				<Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+					<Button x:Name="PhotoButton" Grid.Column="0" Text="📷  Take Photo" Style="{StaticResource GoldButton}" Clicked="OnTakePhotoClicked" />
+					<Button x:Name="VoiceButton" Grid.Column="1" Text="🎙  Record Voice" BackgroundColor="{StaticResource Navy}" TextColor="White"
+					        CornerRadius="12" HeightRequest="50" FontAttributes="Bold" Clicked="OnRecordClicked" />
+				</Grid>
+
+				<Label x:Name="StatusLabel" Text="" FontSize="13" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" IsVisible="False" />
+
+				<Label Text="Saved captures" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Navy}" Margin="0,4,0,0" />
+
+				<CollectionView x:Name="MediaList" SelectionMode="None">
+					<CollectionView.EmptyView>
+						<Label Text="Nothing captured yet." FontSize="14" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" Margin="0,16" />
+					</CollectionView.EmptyView>
+					<CollectionView.ItemTemplate>
+						<DataTemplate x:DataType="svc:MediaItemDto">
+							<Border Margin="0,0,0,10" Padding="14" BackgroundColor="White" StrokeThickness="0" StrokeShape="RoundRectangle 14">
+								<Grid ColumnDefinitions="Auto,*">
+									<Label Text="{Binding Icon}" FontSize="26" VerticalOptions="Center" />
+									<VerticalStackLayout Grid.Column="1" Margin="12,0,0,0" Spacing="2">
+										<Label Text="{Binding Title}" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource Navy}" />
+										<Label Text="{Binding SubText}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+									</VerticalStackLayout>
+								</Grid>
+							</Border>
+						</DataTemplate>
+					</CollectionView.ItemTemplate>
+				</CollectionView>
+
+			</VerticalStackLayout>
+		</ScrollView>
+	</Grid>
+</ContentPage>

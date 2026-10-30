@@ -10,9 +10,11 @@ public record EmailRequest(string Email);
 
 public record ResetPasswordRequest(string Email, string Code, string NewPassword);
 
+public record ChangePasswordRequest(string CurrentPassword, string NewPassword);
+
 public record ApiMessage(string Message);
 
-public record UserProfile(string UserId, string Name, string Email, string Phone, string Status);
+public record UserProfile(string UserId, string Name, string Email, string Phone, string Status, string Role);
 
 public static class OtpPurpose
 {
@@ -27,6 +29,12 @@ public static class UserStatus
     public const string Blocked = "Blocked";
 }
 
+public static class UserRole
+{
+    public const string User = "User";
+    public const string Admin = "Admin";
+}
+
 public class UserRow
 {
     public string UserId { get; set; } = "";
@@ -35,6 +43,7 @@ public class UserRow
     public string Phone { get; set; } = "";
     public string PasswordHash { get; set; } = "";
     public string Status { get; set; } = "";
+    public string Role { get; set; } = UserRole.User;
 
-    public UserProfile ToProfile() => new(UserId, Name, Email, Phone, Status);
+    public UserProfile ToProfile() => new(UserId, Name, Email, Phone, Status, Role);
 }

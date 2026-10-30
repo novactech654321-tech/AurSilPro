@@ -25,7 +25,7 @@ public record MetalQuote(
     decimal Change24hPercent,
     DateTime UpdatedAt);
 
-public record PricesResponse(IReadOnlyList<MetalQuote> Metals, decimal GstPercent, DateTime UpdatedAt);
+public record PricesResponse(IReadOnlyList<MetalQuote> Metals, decimal GstPercent, DateTime UpdatedAt, IReadOnlyList<DiscountDto> Discounts);
 
 public record HistoryPoint(DateTime T, decimal Buy, decimal Sell);
 

@@ -13,6 +13,7 @@ public partial class BuyPage : ContentPage
 	private IDispatcherTimer? _timer;
 	private MetalQuote? _quote;
 	private decimal _gstPercent = 3;
+	private decimal _discount;
 	private bool _byGrams;
 	private string _metal = "gold";
 
@@ -64,8 +65,10 @@ public partial class BuyPage : ContentPage
 		if (_quote is null)
 			return;
 
-		RateLabel.Text = Format.Inr(_quote.BuyRate) + " / g";
-		LiveLabel.Text = $"Live price • updated {_quote.UpdatedAt.ToLocalTime():hh:mm tt} (excl. GST)";
+		_discount = result.Data.DiscountFor(_metal);
+		RateLabel.Text = Format.Inr(Rate) + " / g";
+		LiveLabel.Text = $"Live price • updated {_quote.UpdatedAt.ToLocalTime():hh:mm tt} (excl. GST)" +
+		                 (_discount > 0 ? $" • {_discount:0.##}% OFF applied" : "");
 		GstTitle.Text = $"GST ({_gstPercent:0.##}%)";
 		Recalculate();
 	}
@@ -110,6 +113,9 @@ public partial class BuyPage : ContentPage
 
 	private void OnAmountChanged(object? sender, TextChangedEventArgs e) => Recalculate();
 
+	// Buy rate after the admin's discount, which is what the server charges
+	private decimal Rate => _quote is null ? 0 : Format.DiscountedRate(_quote.BuyRate, _discount);
+
 	// Mirrors the server's calculation so the user sees the exact breakdown before paying
 	private (decimal Grams, decimal Value, decimal Gst, decimal Total) Calculate()
 	{
@@ -120,23 +126,28 @@ public partial class BuyPage : ContentPage
 		if (_byGrams)
 		{
 			var grams = Math.Round(input, 4);
-			var value = Math.Round(grams * _quote.BuyRate, 2);
+			var value = Math.Round(grams * Rate, 2);
 			var gst = Math.Round(value * gstRate, 2);
 			return (grams, value, gst, value + gst);
 		}
 
 		var total = Math.Round(input, 2);
 		var metalValue = Math.Round(total / (1 + gstRate), 2);
-		return (Math.Floor(metalValue / _quote.BuyRate * 10000) / 10000, metalValue, total - metalValue, total);
+		return (Math.Floor(metalValue / Rate * 10000) / 10000, metalValue, total - metalValue, total);
 	}
 
 	private void Recalculate()
 	{
 		ErrorLabel.IsVisible = false;
 		var (grams, value, gst, total) = Calculate();
+		// Shown as list value minus the saving so the rows add up to the total
+		var saving = _quote is null ? 0 : Math.Round(grams * (_quote.BuyRate - Rate), 2);
 		GetLabel.Text = $"{Format.Grams(grams)} {Format.Metal(_metal)}";
-		RateRow.Text = _quote is null ? "--" : Format.Inr(_quote.BuyRate);
-		ValueRow.Text = Format.Inr(value);
+		RateRow.Text = _quote is null ? "--" : _discount > 0 ? $"{Format.Inr(Rate)} ({_discount:0.##}% off)" : Format.Inr(Rate);
+		ValueRow.Text = Format.Inr(value + saving);
+		DiscountTitle.IsVisible = DiscountRow.IsVisible = saving > 0;
+		DiscountTitle.Text = $"Offer discount ({_discount:0.##}%)";
+		DiscountRow.Text = "- " + Format.Inr(saving);
 		GstRow.Text = Format.Inr(gst);
 		TotalRow.Text = Format.Inr(total);
 		PayButton.Text = total > 0 ? $"Proceed to Pay {Format.Inr(total)}" : "Proceed to Pay";

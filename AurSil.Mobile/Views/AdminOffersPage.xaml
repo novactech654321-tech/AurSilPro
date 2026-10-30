@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:svc="clr-namespace:AurSil.Mobile.Services"
+             x:Class="AurSil.Mobile.Views.AdminOffersPage"
+             BackgroundColor="{StaticResource PageBg}"
+             Shell.NavBarIsVisible="False">
+
+	<RefreshView x:Name="Refresher" Refreshing="OnRefreshing" RefreshColor="{StaticResource Gold}">
+		<ScrollView>
+			<VerticalStackLayout>
+				<Grid BackgroundColor="{StaticResource Navy}" Padding="20,24,20,56" ColumnDefinitions="*,Auto">
+					<VerticalStackLayout>
+						<Label Text="Offers" TextColor="White" FontSize="24" FontAttributes="Bold" />
+						<Label Text="Live offers appear on every customer's home screen" TextColor="#AEB8CC" FontSize="13" />
+					</VerticalStackLayout>
+					<Label Grid.Column="1" Text="⋮" TextColor="White" FontSize="28" Padding="12,0,0,0" VerticalOptions="Start">
+						<Label.GestureRecognizers><TapGestureRecognizer Tapped="OnMenuTapped" /></Label.GestureRecognizers>
+					</Label>
+				</Grid>
+
+				<!-- New offer -->
+				<Border Margin="16,-36,16,16" Padding="18" BackgroundColor="White" StrokeThickness="0" StrokeShape="RoundRectangle 18">
+					<Border.Shadow><Shadow Brush="Black" Opacity="0.1" Radius="14" Offset="0,5" /></Border.Shadow>
+					<VerticalStackLayout Spacing="12">
+						<Label Text="Post a new offer" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Navy}" />
+						<VerticalStackLayout>
+							<Label Text="Title" Style="{StaticResource FieldLabel}" />
+							<Border Style="{StaticResource FieldBorder}">
+								<Entry x:Name="TitleEntry" Placeholder="e.g. Diwali Gold Festival" MaxLength="100" Style="{StaticResource FieldEntry}" />
+							</Border>
+						</VerticalStackLayout>
+						<VerticalStackLayout>
+							<Label Text="Message" Style="{StaticResource FieldLabel}" />
+							<Border Style="{StaticResource FieldBorder}" HeightRequest="96">
+								<Editor x:Name="MessageEditor" Placeholder="What customers will see" MaxLength="500" FontSize="15"
+								        TextColor="{StaticResource Navy}" BackgroundColor="Transparent" />
+							</Border>
+						</VerticalStackLayout>
+						<VerticalStackLayout>
+							<Label Text="Valid for (days)" Style="{StaticResource FieldLabel}" />
+							<Border Style="{StaticResource FieldBorder}">
+								<Entry x:Name="DaysEntry" Placeholder="Leave empty for no end date" Keyboard="Numeric" MaxLength="3" Style="{StaticResource FieldEntry}" />
+							</Border>
+						</VerticalStackLayout>
+						<Label x:Name="ErrorLabel" TextColor="{StaticResource ErrorRed}" FontSize="13" IsVisible="False" />
+						<Grid>
+							<Button x:Name="PostButton" Text="Publish to all users" Style="{StaticResource GoldButton}" Clicked="OnPostClicked" />
+							<ActivityIndicator x:Name="Busy" IsRunning="False" IsVisible="False" Color="{StaticResource Navy}"
+							                   HorizontalOptions="Center" VerticalOptions="Center" />
+						</Grid>
+					</VerticalStackLayout>
+				</Border>
+
+				<Label Text="All offers" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource Navy}" Margin="20,6,20,8" />
+				<VerticalStackLayout x:Name="OfferList" Margin="16,0,16,24" Spacing="10">
+					<BindableLayout.ItemTemplate>
+						<DataTemplate x:DataType="svc:OfferDto">
+							<Border BackgroundColor="White" StrokeThickness="0" StrokeShape="RoundRectangle 16" Padding="16">
+								<VerticalStackLayout Spacing="6">
+									<Grid ColumnDefinitions="*,Auto">
+										<Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Navy}" />
+										<Label Grid.Column="1" Text="{Binding StatusText}" FontSize="12" FontAttributes="Bold" TextColor="{Binding StatusColor}" />
+									</Grid>
+									<Label Text="{Binding Message}" FontSize="14" TextColor="#374151" />
+									<Label Text="{Binding ValidityText}" FontSize="11" TextColor="#9CA3AF" />
+									<HorizontalStackLayout Spacing="20" HorizontalOptions="End" Margin="0,4,0,0">
+										<Label Text="Show / Hide" Style="{StaticResource LinkLabel}" FontSize="14">
+											<Label.GestureRecognizers><TapGestureRecognizer Tapped="OnToggleTapped" CommandParameter="{Binding .}" /></Label.GestureRecognizers>
+										</Label>
+										<Label Text="Delete" TextColor="{StaticResource ErrorRed}" FontSize="14" FontAttributes="Bold">
+											<Label.GestureRecognizers><TapGestureRecognizer Tapped="OnDeleteTapped" CommandParameter="{Binding .}" /></Label.GestureRecognizers>
+										</Label>
+									</HorizontalStackLayout>
+								</VerticalStackLayout>
+							</Border>
+						</DataTemplate>
+					</BindableLayout.ItemTemplate>
+					<BindableLayout.EmptyView>
+						<Label Text="No offers yet." TextColor="{StaticResource TextMuted}" HorizontalOptions="Center" Margin="0,16" />
+					</BindableLayout.EmptyView>
+				</VerticalStackLayout>
+			</VerticalStackLayout>
+		</ScrollView>
+	</RefreshView>
+</ContentPage>

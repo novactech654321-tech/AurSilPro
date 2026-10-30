@@ -16,6 +16,16 @@ public static class PasswordHasher
         return $"{Iterations}.{Convert.ToBase64String(salt)}.{Convert.ToBase64String(key)}";
     }
 
+    // Null when the password meets the rules, otherwise the message to show
+    public static string? RuleError(string? password)
+    {
+        if (string.IsNullOrEmpty(password) || password.Length < 8)
+            return "Password must be at least 8 characters.";
+        if (!password.Any(char.IsLetter) || !password.Any(char.IsDigit))
+            return "Password must contain letters and numbers.";
+        return null;
+    }
+
     public static bool Verify(string password, string stored)
     {
         var parts = stored.Split('.');

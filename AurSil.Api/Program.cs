@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AurSil.Api.Mcp;
 using AurSil.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -19,13 +20,30 @@ builder.Services.AddHttpClient("razorpay", c => c.Timeout = TimeSpan.FromSeconds
 builder.Services.AddSingleton(builder.Configuration.GetSection("Smtp").Get<SmtpOptions>() ?? new SmtpOptions());
 builder.Services.AddSingleton(builder.Configuration.GetSection("Pricing").Get<PricingOptions>() ?? new PricingOptions());
 builder.Services.AddSingleton(builder.Configuration.GetSection("Razorpay").Get<RazorpayOptions>() ?? new RazorpayOptions());
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<ActivityService>();
+builder.Services.AddSingleton<StoreService>();
 builder.Services.AddSingleton<EmailSender>();
 builder.Services.AddSingleton<OtpService>();
 builder.Services.AddSingleton<TokenService>();
 builder.Services.AddSingleton<PriceService>();
 builder.Services.AddSingleton<RazorpayService>();
 builder.Services.AddSingleton<OrderService>();
+builder.Services.AddSingleton<TradeService>();
+builder.Services.AddSingleton<McpKeyService>();
+builder.Services.AddSingleton<MediaService>();
 builder.Services.AddHostedService<PriceUpdater>();
+
+// AI assistant connector (Model Context Protocol) for ChatGPT and Claude, served at /mcp/{personal key}
+builder.Services.AddMcpServer(o =>
+    {
+        o.ServerInfo = new() { Name = "aursil", Title = "AurSil", Version = "1.1" };
+        o.ServerInstructions = "AurSil is an Indian digital gold, silver and platinum account. Prices are INR per gram; 3% GST is added when buying. " +
+            "Buying creates an order the user must pay through payment_url before metal is credited. Selling completes immediately " +
+            "and pays the user's bank account, so always confirm quantities with the user before buy_metal or sell_metal.";
+    })
+    .WithHttpTransport()
+    .WithTools<AurSilTools>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(o => o.TokenValidationParameters = new TokenValidationParameters
@@ -43,17 +61,21 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+await AdminSeeder.EnsureAdminAsync(app.Configuration, app.Logger);
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseCors();
 }
 
+app.UseMcpAuth();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGet("/", () => Results.Ok(new { app = "AurSil API", status = "running" }));
 app.MapControllers();
+app.MapMcp("/mcp/{key}");
 
 app.Run();
 

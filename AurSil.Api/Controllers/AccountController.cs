@@ -12,7 +12,8 @@ namespace AurSil.Api.Controllers;
 [ApiController]
 [Authorize]
 [Route("api")]
-public partial class AccountController(IConfiguration config, PriceService prices, IHttpClientFactory httpFactory) : ControllerBase
+public partial class AccountController(IConfiguration config, IHttpClientFactory httpFactory,
+    ActivityService activity, TradeService trade, McpKeyService mcpKeys) : ControllerBase
 {
     private readonly string _connectionString = config.GetConnectionString("Aursil")!;
 
@@ -30,29 +31,61 @@ public partial class AccountController(IConfiguration config, PriceService price
         return user is null ? NotFound() : Ok(user.ToProfile());
     }
 
-    [HttpGet("portfolio")]
-    public async Task<IActionResult> Portfolio()
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword(ChangePasswordRequest req)
     {
+        if (PasswordHasher.RuleError(req.NewPassword) is { } pwError)
+            return BadRequest(new ApiMessage(pwError));
+
         await using var db = new SqlConnection(_connectionString);
-        var rows = (await db.QueryAsync<(string Metal, decimal Grams, decimal InvestedAmount)>(
-            "SELECT Metal, Grams, InvestedAmount FROM Holdings WHERE UserId = @id", new { id = User.UserId() })).ToList();
+        var user = await db.QuerySingleOrDefaultAsync<UserRow>("SELECT * FROM Users WHERE UserId = @id", new { id = User.UserId() });
+        if (user is null)
+            return NotFound(new ApiMessage("Account not found."));
+        if (!PasswordHasher.Verify(req.CurrentPassword ?? "", user.PasswordHash))
+            return BadRequest(new ApiMessage("Current password is incorrect."));
+        if (req.CurrentPassword == req.NewPassword)
+            return BadRequest(new ApiMessage("New password must be different from the current one."));
 
-        var holdings = Metals.All.Select(metal =>
-        {
-            var h = rows.FirstOrDefault(r => r.Metal == metal);
-            var sellRate = prices.Get(metal)?.SellRate ?? 0;
-            var value = Math.Round(h.Grams * sellRate, 2);
-            var pl = value - h.InvestedAmount;
-            var plPct = h.InvestedAmount > 0 ? Math.Round(pl / h.InvestedAmount * 100, 2) : 0;
-            return new HoldingDto(metal, h.Grams, h.InvestedAmount, value, pl, plPct, sellRate);
-        }).ToList();
-
-        var invested = holdings.Sum(h => h.Invested);
-        var total = holdings.Sum(h => h.CurrentValue);
-        var profit = total - invested;
-        return Ok(new PortfolioResponse(holdings, invested, total, profit,
-            invested > 0 ? Math.Round(profit / invested * 100, 2) : 0));
+        await db.ExecuteAsync("UPDATE Users SET PasswordHash = @hash WHERE UserId = @UserId",
+            new { hash = PasswordHasher.Hash(req.NewPassword), user.UserId });
+        await activity.LogAsync(user.UserId, Activity.PasswordChanged, "Changed from the app");
+        return Ok(new ApiMessage("Password changed successfully."));
     }
+
+    // Tokens are stateless, so this only records the logout in the activity log
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        await activity.LogAsync(User.UserId(), Activity.Logout);
+        return Ok(new ApiMessage("Logged out."));
+    }
+
+    // AI assistant connector: the URL holds a personal key, so creating a new one disconnects any earlier assistant
+    [HttpGet("assistant")]
+    public async Task<IActionResult> Assistant()
+    {
+        var createdAt = await mcpKeys.CreatedAtAsync(User.UserId());
+        return Ok(new { connected = createdAt is not null, createdAt });
+    }
+
+    [HttpPost("assistant/key")]
+    public async Task<IActionResult> CreateAssistantKey()
+    {
+        var key = await mcpKeys.CreateAsync(User.UserId());
+        await activity.LogAsync(User.UserId(), Activity.AssistantConnected, "Created an AI assistant connector link");
+        return Ok(new { url = mcpKeys.ConnectorUrl(Request, key) });
+    }
+
+    [HttpDelete("assistant/key")]
+    public async Task<IActionResult> RevokeAssistantKey()
+    {
+        await mcpKeys.RevokeAsync(User.UserId());
+        await activity.LogAsync(User.UserId(), Activity.AssistantDisconnected, "Disconnected the AI assistant");
+        return Ok(new ApiMessage("AI assistant disconnected."));
+    }
+
+    [HttpGet("portfolio")]
+    public async Task<IActionResult> Portfolio() => Ok(await trade.PortfolioAsync(User.UserId()));
 
     [HttpGet("bank")]
     public async Task<IActionResult> GetBank()
@@ -90,6 +123,7 @@ public partial class AccountController(IConfiguration config, PriceService price
             new { userId = User.UserId(), holder, account, ifsc, bankName = info.BankName, branch = $"{info.Branch}, {info.City}" });
 
         var saved = await db.QuerySingleAsync<BankAccountRow>("SELECT * FROM BankAccounts WHERE UserId = @id", new { id = User.UserId() });
+        await activity.LogAsync(saved.UserId, Activity.BankAccountSaved, $"{saved.BankName} {BankMask.Mask(saved.AccountNumber)}, {saved.Ifsc}");
         return Ok(saved.ToDto());
     }
 

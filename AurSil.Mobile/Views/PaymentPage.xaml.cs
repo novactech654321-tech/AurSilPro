@@ -47,10 +47,12 @@ public partial class PaymentPage : ContentPage
 		}
 		else if (status == "cancelled")
 		{
+			await _api.AbandonOrderAsync(OrderNo, "cancelled");
 			await Shell.Current.GoToAsync("..");
 		}
 		else
 		{
+			await _api.AbandonOrderAsync(OrderNo, "failed");
 			await DisplayAlertAsync("Payment failed", "The payment could not be completed. No metal was credited.", "OK");
 			await Shell.Current.GoToAsync("..");
 		}
@@ -58,8 +60,11 @@ public partial class PaymentPage : ContentPage
 
 	private async void OnCloseTapped(object? sender, TappedEventArgs e)
 	{
-		if (await DisplayAlertAsync("Cancel payment?", "Your order will not be placed.", "Cancel payment", "Continue"))
-			await Shell.Current.GoToAsync("..");
+		if (!await DisplayAlertAsync("Cancel payment?", "Your order will not be placed.", "Cancel payment", "Continue"))
+			return;
+		_finished = true;
+		await _api.AbandonOrderAsync(OrderNo, "cancelled");
+		await Shell.Current.GoToAsync("..");
 	}
 
 	protected override bool OnBackButtonPressed()

@@ -27,6 +27,9 @@ public static class Session
 
 	public static bool IsLoggedIn => CurrentUser is not null && Token is not null;
 
+	// Admins land on the admin console, everyone else on the investor home screen
+	public static string HomeRoute => CurrentUser?.IsAdmin == true ? "//admin/stock" : "//main/home";
+
 	public static void SignIn(string token, UserProfile user)
 	{
 		Preferences.Default.Set(TokenKey, token);

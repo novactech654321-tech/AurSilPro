@@ -80,16 +80,18 @@
 
 						<!-- Breakdown -->
 						<Border BackgroundColor="#F8FAFC" Stroke="#E5E7EB" StrokeShape="RoundRectangle 14" Padding="14">
-							<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="8">
+							<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="8">
 								<Label Text="You get" Style="{StaticResource Row}" />
 								<Label x:Name="GetLabel" Grid.Column="1" Text="0 g" Style="{StaticResource RowValue}" FontAttributes="Bold" FontSize="16" />
 								<Label Grid.Row="1" Text="Rate / g" Style="{StaticResource Row}" />
 								<Label x:Name="RateRow" Grid.Row="1" Grid.Column="1" Text="--" Style="{StaticResource RowValue}" />
 								<Label Grid.Row="2" Text="Metal value" Style="{StaticResource Row}" />
 								<Label x:Name="ValueRow" Grid.Row="2" Grid.Column="1" Text="₹0.00" Style="{StaticResource RowValue}" />
-								<Label x:Name="GstTitle" Grid.Row="3" Text="GST (3%)" Style="{StaticResource Row}" />
-								<Label x:Name="GstRow" Grid.Row="3" Grid.Column="1" Text="₹0.00" Style="{StaticResource RowValue}" />
-								<BoxView Grid.Row="4" Grid.ColumnSpan="2" HeightRequest="1" Color="#E5E7EB" VerticalOptions="Start" />
+								<Label x:Name="DiscountTitle" Grid.Row="3" Text="Offer discount" Style="{StaticResource Row}" TextColor="#15803D" IsVisible="False" />
+								<Label x:Name="DiscountRow" Grid.Row="3" Grid.Column="1" Text="" Style="{StaticResource RowValue}" TextColor="#15803D" IsVisible="False" />
+								<Label x:Name="GstTitle" Grid.Row="4" Text="GST (3%)" Style="{StaticResource Row}" />
+								<Label x:Name="GstRow" Grid.Row="4" Grid.Column="1" Text="₹0.00" Style="{StaticResource RowValue}" />
+								<BoxView Grid.Row="5" Grid.ColumnSpan="2" HeightRequest="1" Color="#E5E7EB" VerticalOptions="Start" />
 							</Grid>
 						</Border>
 						<Grid ColumnDefinitions="*,Auto">

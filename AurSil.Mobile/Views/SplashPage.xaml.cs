@@ -27,6 +27,6 @@ public partial class SplashPage : ContentPage
 		StatusLabel.Text = "Loading your account...";
 		await Task.Delay(1200);
 
-		await Shell.Current.GoToAsync(Session.IsLoggedIn ? "//main/home" : "//login");
+		await Shell.Current.GoToAsync(Session.IsLoggedIn ? Session.HomeRoute : "//login");
 	}
 }

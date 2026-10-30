@@ -30,4 +30,20 @@
         </Tab>
     </TabBar>
 
+    <!-- Admin console: only reached when the logged-in account has the Admin role -->
+    <TabBar Route="admin">
+        <Tab Title="Stock" Icon="tab_stock.png" Route="stock">
+            <ShellContent ContentTemplate="{DataTemplate views:AdminStockPage}" />
+        </Tab>
+        <Tab Title="Offers" Icon="tab_offer.png" Route="offers">
+            <ShellContent ContentTemplate="{DataTemplate views:AdminOffersPage}" />
+        </Tab>
+        <Tab Title="Discounts" Icon="tab_discount.png" Route="discounts">
+            <ShellContent ContentTemplate="{DataTemplate views:AdminDiscountsPage}" />
+        </Tab>
+        <Tab Title="Activity" Icon="tab_log.png" Route="activity">
+            <ShellContent ContentTemplate="{DataTemplate views:AdminActivityPage}" />
+        </Tab>
+    </TabBar>
+
 </Shell>

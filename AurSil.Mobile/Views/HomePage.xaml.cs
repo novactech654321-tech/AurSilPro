@@ -27,10 +27,10 @@ public partial class HomePage : ContentPage
 
 		_timer = Dispatcher.CreateTimer();
 		_timer.Interval = TimeSpan.FromSeconds(30);
-		_timer.Tick += async (_, _) => await LoadPricesAsync();
+		_timer.Tick += async (_, _) => await Task.WhenAll(LoadPricesAsync(), LoadOffersAsync());
 		_timer.Start();
 
-		await Task.WhenAll(LoadPricesAsync(), LoadPortfolioAsync(), LoadChartAsync());
+		await Task.WhenAll(LoadPricesAsync(), LoadOffersAsync(), LoadPortfolioAsync(), LoadChartAsync());
 	}
 
 	protected override void OnDisappearing()
@@ -41,8 +41,17 @@ public partial class HomePage : ContentPage
 
 	private async void OnRefreshing(object? sender, EventArgs e)
 	{
-		await Task.WhenAll(LoadPricesAsync(), LoadPortfolioAsync(), LoadChartAsync());
+		await Task.WhenAll(LoadPricesAsync(), LoadOffersAsync(), LoadPortfolioAsync(), LoadChartAsync());
 		Refresher.IsRefreshing = false;
+	}
+
+	private async Task LoadOffersAsync()
+	{
+		var result = await _api.GetOffersAsync();
+		if (!result.Ok)
+			return;
+		BindableLayout.SetItemsSource(OfferList, result.Data);
+		OfferList.IsVisible = result.Data is { Count: > 0 };
 	}
 
 	private async Task LoadPricesAsync()
@@ -56,14 +65,17 @@ public partial class HomePage : ContentPage
 
 		foreach (var q in result.Data.Metals)
 		{
-			var (rate, change) = q.Metal switch
+			var (rate, change, off) = q.Metal switch
 			{
-				"gold" => (GoldRate, GoldChange),
-				"silver" => (SilverRate, SilverChange),
-				_ => (PlatinumRate, PlatinumChange),
+				"gold" => (GoldRate, GoldChange, GoldOff),
+				"silver" => (SilverRate, SilverChange, SilverOff),
+				_ => (PlatinumRate, PlatinumChange, PlatinumOff),
 			};
-			rate.Text = Format.Inr(q.BuyRate) + "/g";
+			var discount = result.Data.DiscountFor(q.Metal);
+			rate.Text = Format.Inr(Format.DiscountedRate(q.BuyRate, discount)) + "/g";
 			change.Text = Format.Percent(q.Change24hPercent);
+			off.Text = $"{discount:0.##}% OFF";
+			off.IsVisible = discount > 0;
 		}
 		UpdatedLabel.Text = "LIVE • " + result.Data.UpdatedAt.ToLocalTime().ToString("hh:mm tt");
 	}

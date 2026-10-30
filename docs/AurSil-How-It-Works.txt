@@ -1,0 +1,306 @@
+==============================================================
+                AURSIL - HOW THE WHOLE APP WORKS
+                      (simple explanation)
+==============================================================
+
+AurSil is an app to BUY and SELL GOLD, SILVER and PLATINUM in
+small amounts, like 0.5 gram. Your metal is saved in your
+account. You can sell it any time, and the money goes to your
+bank account.
+
+
+--------------------------------------------------------------
+1. THE BIG PICTURE
+--------------------------------------------------------------
+
+There are 4 parts:
+
+   [ Phone App ]    [ Chrome Preview ]    [ ChatGPT / Claude ]
+   (Android APK)    (preview/aursil.html)  (AI connector)
+         \                 |                    /
+          \                |                   /
+           v               v                  v
+        +-------------------------------------------+
+        |        AurSil API  (the "backend")        |
+        |   ASP.NET Core .NET 10, port 5168         |
+        +-------------------------------------------+
+              |              |               |
+              v              v               v
+        [ SQL Server ]  [ gold-api.com ]  [ Razorpay ]
+        database        live prices       payments (test)
+        "aursil"                          + email for OTP
+
+ - The PHONE APP is only the screen. It holds no data itself.
+ - The API is the brain. Every rule runs here.
+ - The DATABASE keeps everything: users, orders, holdings
+   and so on.
+ - Every app talks to the API with REST calls (HTTP + JSON).
+
+
+--------------------------------------------------------------
+2. FOLDERS
+--------------------------------------------------------------
+
+ AurSil.Api\        Backend (C#)
+   Controllers\     The URLs the app calls (api/...)
+   Services\        The real logic (prices, orders, OTP...)
+   Models\          Data shapes (requests / responses)
+   Mcp\             AI assistant tools (ChatGPT / Claude)
+   Program.cs       Startup: connects everything together
+
+ AurSil.Mobile\     Android app (.NET MAUI)
+   Views\           Every screen (xaml = design, xaml.cs = code)
+   Services\        ApiClient (calls the API), Session, Models
+   AppShell.xaml    Tabs and navigation
+
+ Database\          SQL scripts (schema v1 to v4)
+ preview\           Same app as a web page for Chrome
+ web\               Showcase website pages
+ docs\              These guides
+ AurSil.apk         The built Android app (v1.2)
+
+
+--------------------------------------------------------------
+3. USER JOURNEY (WHAT THE USER SEES)
+--------------------------------------------------------------
+
+ SPLASH  ->  LOGIN  ->  HOME / MARKET / PORTFOLIO / PROFILE
+
+ 3.1 Register
+     Register screen: name, email, phone, password
+        -> the API saves the user with Status = "Pending"
+        -> a 6-digit OTP is emailed (valid 10 min, max 5 tries)
+     OTP screen: enter the code
+        -> correct: Status becomes "Active", user logged in
+        -> "Resend OTP" sends a new code
+
+ 3.2 Login
+     Enter email/user ID + password
+        -> the API checks the password hash
+        -> Blocked = refused, Pending = asked to verify OTP
+        -> OK = the API gives a TOKEN (JWT, valid 7 days)
+     The app saves the token and sends it with every request
+     ("Authorization: Bearer <token>").
+     So the API always knows WHO is calling.
+
+     "Forgot password" -> OTP to email -> set a new password.
+
+ 3.3 Home tab
+     - Live prices of gold, silver and platinum (per gram)
+     - Your total holdings value
+     - Offers banner (set by the admin)
+     - Buy / Sell buttons
+
+ 3.4 Market tab
+     - Price chart (trend) for each metal
+     - Buy rate, sell rate, 24h change
+
+ 3.5 Buy
+     Choose a metal -> enter GRAMS or RUPEES
+     The app shows: rate, discount, GST (3%), total
+     Press Buy -> an order is created (status "Created")
+               -> the Payment screen opens
+     Pay (Razorpay test, or "simulate")
+               -> order "Completed"
+               -> grams added to your Holdings
+               -> stock reduced
+
+ 3.6 Sell
+     Choose a metal + grams (cannot be more than you hold)
+     You need a bank account saved first.
+     Sell -> completes at once, the money goes to the bank
+     account, grams are removed from your holdings.
+
+ 3.7 Portfolio tab
+     - Grams of each metal you hold
+     - Invested amount vs current value -> profit / loss
+     - Transaction history (all buys and sells)
+
+ 3.8 Profile tab
+     - Name, email, phone, status
+     - Bank Account (add/edit, IFSC auto-checks the bank name)
+     - Transactions
+     - Change Password
+     - AI Assistant (connect ChatGPT/Claude, see section 7)
+     - Server address (which API URL the app uses)
+     - Logout
+
+
+--------------------------------------------------------------
+4. ADMIN (OWNER) SIDE
+--------------------------------------------------------------
+
+ Log in with the admin account -> the app shows ADMIN tabs
+ instead of the user tabs. (The token carries Role = "Admin".)
+
+   Stock      How many grams of each metal are available to
+              sell. Buying reduces stock. The admin can top it
+              up.
+   Offers     Create / edit / delete offer messages that users
+              see on Home.
+   Discounts  % off the buy price for each metal (e.g. 5% on
+              gold). On/off switch.
+   Activity   Log of everything: logins, buys, sells, payments,
+              admin changes, AI assistant actions. It can be
+              downloaded as a file.
+
+ The ⋮ menu has: Change password, Server address, Logout.
+
+ Admin URLs are under api/admin/... and ONLY work with an admin
+ token. Otherwise you get 403 (Forbidden).
+
+
+--------------------------------------------------------------
+5. HOW PRICES ARE MADE
+--------------------------------------------------------------
+
+ Every 60 seconds the API (PriceService) does this:
+   1. Fetches the world spot price from gold-api.com (in USD)
+   2. Converts it to INR per gram (the "landed" price)
+   3. Buy rate  = landed + 1.5%    (you pay a bit more)
+      Sell rate = landed - 1.5%    (you get a bit less)
+   4. Saves it to PriceHistory (used for the charts)
+
+ When you buy:
+   rate   = buy rate - discount %
+   amount = rate x grams
+   GST    = 3% of amount
+   total  = amount + GST
+
+
+--------------------------------------------------------------
+6. DATABASE TABLES (SQL Server "aursil")
+--------------------------------------------------------------
+
+ Users          Every account: name, email, phone, password
+                hash, Status (Active / Pending / Blocked),
+                Role (User / Admin), AI key hash
+ OtpCodes       OTP codes (stored as a hash), expiry, attempts
+ Orders         Every buy and sell: order no, metal, grams,
+                rate, GST, total, status, discount
+ Holdings       How many grams each user owns of each metal
+ BankAccounts   The user's bank (account number shown masked)
+ PriceHistory   Old prices for the charts
+ Inventory      Stock of each metal (admin)
+ Offers         Offer messages (admin)
+ Discounts      % discount for each metal (admin)
+ ActivityLog    Who did what, and when
+
+ Passwords, OTPs and AI keys are NEVER saved as plain text,
+ only as a hash.
+
+
+--------------------------------------------------------------
+7. AI ASSISTANT (ChatGPT / Claude) - SHORT VERSION
+--------------------------------------------------------------
+
+ Profile -> AI Assistant -> Create connector link
+ Paste the link into ChatGPT or Claude as a connector.
+ Then chat: "buy 2 grams of gold"
+   -> the AI calls the API tool buy_metal
+   -> an order is created on YOUR account
+   -> the AI gives you a payment link -> you pay -> gold added
+
+ The full explanation is in docs\AI-Assistant-MCP-Guide.md
+
+
+--------------------------------------------------------------
+8. ONE FULL EXAMPLE: "BUY 1 GRAM GOLD" IN THE APP
+--------------------------------------------------------------
+
+ Phone                      API                       Database
+ -----                      ---                       --------
+ Tap Buy, 1 g gold
+   POST api/orders/buy  -->  check token = user
+                             get live rate
+                             apply discount + GST
+                             check stock         -->  Inventory
+                             create order        -->  Orders (Created)
+   <-- order no + total
+ Payment screen opens
+   pay  ------------------>  /pay/{orderNo}
+                             payment OK
+                             order Completed     -->  Orders
+                             add 1 g             -->  Holdings
+                             reduce stock        -->  Inventory
+                             write log           -->  ActivityLog
+ Portfolio shows +1 g
+
+
+--------------------------------------------------------------
+9. MAIN API URLs (for Postman)
+--------------------------------------------------------------
+
+ Base: http://localhost:5168
+
+ No token needed:
+   POST api/auth/register           create account
+   POST api/auth/verify-otp         confirm email
+   POST api/auth/resend-otp
+   POST api/auth/login              -> gives the token
+   POST api/auth/forgot-password
+   POST api/auth/reset-password
+   GET  api/prices                  live prices
+   GET  api/prices/history          chart data
+   GET  api/offers                  active offers
+
+ Token needed (user):
+   GET  api/me                      my details
+   GET  api/portfolio               my holdings
+   POST api/orders/buy              buy
+   POST api/orders/sell             sell
+   GET  api/orders                  my orders
+   GET  api/orders/{orderNo}        one order
+   GET  api/bank  /  PUT api/bank   bank account
+   GET  api/bank/ifsc/{ifsc}        bank name from IFSC
+   POST api/change-password
+   POST api/logout
+   GET/POST/DELETE api/assistant... AI connector
+
+ Admin token needed:
+   GET  api/admin/dashboard
+   PUT  api/admin/inventory/{metal}  stock
+   GET/POST/PUT/DELETE api/admin/offers
+   GET  api/admin/discounts, PUT api/admin/discounts/{metal}
+   GET  api/admin/activity, GET api/admin/activity/file
+
+ Status codes:
+   200 OK  |  400 bad input  |  401 no/expired token
+   403 not allowed (e.g. a user calling an admin URL)
+   404 not found
+
+
+--------------------------------------------------------------
+10. HOW TO RUN EVERYTHING
+--------------------------------------------------------------
+
+ 1. SQL Server LocalDB must be running (database "aursil").
+ 2. Start the API:
+      cd E:\AurSil\AurSil.Api
+      $env:DOTNET_ROOT='E:\DevTools\dotnet'
+      E:\DevTools\dotnet\dotnet.exe run --launch-profile http
+    -> it runs at http://localhost:5168
+ 3. Use any of these:
+    - Chrome:  open preview\aursil.html
+    - Phone:   install AurSil.apk, then in Profile -> Server
+               address, set your PC's IP or ngrok URL
+    - AI:      run "ngrok http 5168", then create a connector
+               link in the app
+ 4. Postman: login first, copy the token, then use it as a
+    "Bearer" token for the other URLs.
+
+
+--------------------------------------------------------------
+11. SECURITY IN SHORT
+--------------------------------------------------------------
+
+ - Passwords are stored as a hash (they cannot be read back).
+ - Every request carries a token, and the API checks who you are.
+ - Users can see only THEIR OWN orders and holdings.
+ - Admin URLs check Role = Admin.
+ - The AI assistant can only use the 7 tools, only for the
+   account that owns the link, and buying always needs YOU to
+   pay yourself.
+ - Blocked users cannot log in and cannot use the AI link.
+
+==============================================================

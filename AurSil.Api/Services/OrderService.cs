@@ -7,7 +7,7 @@ using Microsoft.Data.SqlClient;
 
 namespace AurSil.Api.Services;
 
-public class OrderService(IConfiguration config, EmailSender email, ILogger<OrderService> logger)
+public class OrderService(IConfiguration config, EmailSender email, ActivityService activity, ILogger<OrderService> logger)
 {
     private static readonly CultureInfo India = CultureInfo.GetCultureInfo("en-IN");
     private readonly string _connectionString = config.GetConnectionString("Aursil")!;
@@ -55,9 +55,14 @@ public class OrderService(IConfiguration config, EmailSender email, ILogger<Orde
             WHEN NOT MATCHED THEN INSERT (UserId, Metal, Grams, InvestedAmount) VALUES (@UserId, @Metal, @Grams, @Total);
             """, new { order.UserId, order.Metal, order.Grams, order.Total }, tx);
 
+        await db.ExecuteAsync("UPDATE Inventory SET StockGrams = StockGrams - @Grams, UpdatedAt = SYSUTCDATETIME() WHERE Metal = @Metal",
+            new { order.Grams, order.Metal }, tx);
+
         await tx.CommitAsync();
         order.Status = "Completed";
         order.PaymentGateway = gateway;
+        await activity.LogAsync(order.UserId, Activity.BuyCompleted,
+            $"{order.OrderNo}: {order.Grams:0.####} g {Metals.Display(order.Metal)}, paid {Inr(order.Total)} via {gateway} ({paymentId})");
         await SendOrderEmailAsync(order);
         return true;
     }

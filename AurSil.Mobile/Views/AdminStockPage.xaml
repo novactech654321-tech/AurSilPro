@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:svc="clr-namespace:AurSil.Mobile.Services"
+             x:Class="AurSil.Mobile.Views.AdminStockPage"
+             BackgroundColor="{StaticResource PageBg}"
+             Shell.NavBarIsVisible="False">
+
+	<ContentPage.Resources>
+		<Style x:Key="Tile" TargetType="Border">
+			<Setter Property="BackgroundColor" Value="#16305A" />
+			<Setter Property="StrokeThickness" Value="0" />
+			<Setter Property="StrokeShape" Value="RoundRectangle 14" />
+			<Setter Property="Padding" Value="10,12" />
+		</Style>
+		<Style x:Key="TileValue" TargetType="Label">
+			<Setter Property="TextColor" Value="{StaticResource Gold}" />
+			<Setter Property="FontSize" Value="20" />
+			<Setter Property="FontAttributes" Value="Bold" />
+			<Setter Property="HorizontalOptions" Value="Center" />
+		</Style>
+		<Style x:Key="TileCaption" TargetType="Label">
+			<Setter Property="TextColor" Value="#AEB8CC" />
+			<Setter Property="FontSize" Value="11" />
+			<Setter Property="HorizontalOptions" Value="Center" />
+		</Style>
+		<Style x:Key="Caption" TargetType="Label">
+			<Setter Property="TextColor" Value="{StaticResource TextMuted}" />
+			<Setter Property="FontSize" Value="12" />
+		</Style>
+	</ContentPage.Resources>
+
+	<RefreshView x:Name="Refresher" Refreshing="OnRefreshing" RefreshColor="{StaticResource Gold}">
+		<ScrollView>
+			<VerticalStackLayout>
+				<VerticalStackLayout BackgroundColor="{StaticResource Navy}" Padding="20,24,20,56" Spacing="14">
+					<Grid ColumnDefinitions="*,Auto">
+						<VerticalStackLayout>
+							<Label Text="Admin Console" TextColor="White" FontSize="24" FontAttributes="Bold" />
+							<Label Text="Vault stock and today's business" TextColor="#AEB8CC" FontSize="13" />
+						</VerticalStackLayout>
+						<Label Grid.Column="1" Text="⋮" TextColor="White" FontSize="28" Padding="12,0,0,0" VerticalOptions="Start">
+							<Label.GestureRecognizers><TapGestureRecognizer Tapped="OnMenuTapped" /></Label.GestureRecognizers>
+						</Label>
+					</Grid>
+					<Grid ColumnDefinitions="*,*,*" ColumnSpacing="10">
+						<Border Style="{StaticResource Tile}">
+							<VerticalStackLayout>
+								<Label x:Name="UsersLabel" Text="-" Style="{StaticResource TileValue}" />
+								<Label Text="Customers" Style="{StaticResource TileCaption}" />
+							</VerticalStackLayout>
+						</Border>
+						<Border Grid.Column="1" Style="{StaticResource Tile}">
+							<VerticalStackLayout>
+								<Label x:Name="LoginsLabel" Text="-" Style="{StaticResource TileValue}" />
+								<Label Text="Logged in today" Style="{StaticResource TileCaption}" />
+							</VerticalStackLayout>
+						</Border>
+						<Border Grid.Column="2" Style="{StaticResource Tile}">
+							<VerticalStackLayout>
+								<Label x:Name="OrdersLabel" Text="-" Style="{StaticResource TileValue}" />
+								<Label Text="Orders today" Style="{StaticResource TileCaption}" />
+							</VerticalStackLayout>
+						</Border>
+					</Grid>
+					<Grid ColumnDefinitions="*,*">
+						<VerticalStackLayout>
+							<Label Text="Sold to customers today" TextColor="#AEB8CC" FontSize="12" />
+							<Label x:Name="BuyValueLabel" Text="₹0.00" TextColor="White" FontSize="17" FontAttributes="Bold" />
+						</VerticalStackLayout>
+						<VerticalStackLayout Grid.Column="1" HorizontalOptions="End">
+							<Label Text="Bought back today" TextColor="#AEB8CC" FontSize="12" HorizontalOptions="End" />
+							<Label x:Name="SellValueLabel" Text="₹0.00" TextColor="White" FontSize="17" FontAttributes="Bold" HorizontalOptions="End" />
+						</VerticalStackLayout>
+					</Grid>
+				</VerticalStackLayout>
+
+				<Label x:Name="ErrorLabel" TextColor="{StaticResource ErrorRed}" FontSize="13" IsVisible="False" Margin="20,8,20,0" />
+
+				<VerticalStackLayout x:Name="StockList" Margin="16,-36,16,24" Spacing="12">
+					<BindableLayout.ItemTemplate>
+						<DataTemplate x:DataType="svc:MetalStockDto">
+							<Border BackgroundColor="White" StrokeThickness="0" StrokeShape="RoundRectangle 18" Padding="16">
+								<Border.Shadow><Shadow Brush="Black" Opacity="0.08" Radius="12" Offset="0,4" /></Border.Shadow>
+								<VerticalStackLayout Spacing="12">
+									<Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+										<Border WidthRequest="44" HeightRequest="44" StrokeThickness="0" StrokeShape="RoundRectangle 22" BackgroundColor="{Binding Accent}">
+											<Label Text="{Binding Symbol}" FontAttributes="Bold" TextColor="{StaticResource Navy}" HorizontalOptions="Center" VerticalOptions="Center" />
+										</Border>
+										<VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+											<Label Text="{Binding Name}" FontSize="17" FontAttributes="Bold" TextColor="{StaticResource Navy}" />
+											<Label Text="{Binding StockState}" FontSize="11" FontAttributes="Bold" TextColor="{Binding StockStateColor}" />
+										</VerticalStackLayout>
+										<VerticalStackLayout Grid.Column="2" VerticalOptions="Center">
+											<Label Text="{Binding StockText}" FontSize="22" FontAttributes="Bold" TextColor="{StaticResource Navy}" HorizontalOptions="End" />
+											<Label Text="in vault" Style="{StaticResource Caption}" HorizontalOptions="End" />
+										</VerticalStackLayout>
+									</Grid>
+									<Label Text="{Binding ValueText}" Style="{StaticResource Caption}" />
+									<BoxView HeightRequest="1" Color="#EEF1F6" />
+									<Grid ColumnDefinitions="*,*">
+										<VerticalStackLayout>
+											<Label Text="Held by customers" Style="{StaticResource Caption}" />
+											<Label Text="{Binding CustomerText}" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource Navy}" />
+										</VerticalStackLayout>
+										<VerticalStackLayout Grid.Column="1" HorizontalOptions="End">
+											<Label Text="Today: customers bought / sold" Style="{StaticResource Caption}" HorizontalOptions="End" />
+											<Label Text="{Binding TodayText}" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource Navy}" HorizontalOptions="End" />
+										</VerticalStackLayout>
+									</Grid>
+									<Grid ColumnDefinitions="*,Auto">
+										<Label Text="{Binding UpdatedText}" FontSize="11" TextColor="#9CA3AF" VerticalOptions="Center" />
+										<Border Grid.Column="1" BackgroundColor="{StaticResource Gold}" StrokeThickness="0" StrokeShape="RoundRectangle 10" Padding="14,8">
+											<Border.GestureRecognizers><TapGestureRecognizer Tapped="OnUpdateStockTapped" CommandParameter="{Binding Metal}" /></Border.GestureRecognizers>
+											<Label Text="Update stock" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource Navy}" />
+										</Border>
+									</Grid>
+								</VerticalStackLayout>
+							</Border>
+						</DataTemplate>
+					</BindableLayout.ItemTemplate>
+				</VerticalStackLayout>
+			</VerticalStackLayout>
+		</ScrollView>
+	</RefreshView>
+</ContentPage>

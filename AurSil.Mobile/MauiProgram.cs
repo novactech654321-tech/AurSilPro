@@ -44,6 +44,12 @@ public static class MauiProgram
 		builder.Services.AddTransient<SellPage>();
 		builder.Services.AddTransient<PaymentPage>();
 		builder.Services.AddTransient<BankPage>();
+		builder.Services.AddTransient<ChangePasswordPage>();
+		builder.Services.AddTransient<MediaPage>();
+		builder.Services.AddTransient<AdminStockPage>();
+		builder.Services.AddTransient<AdminOffersPage>();
+		builder.Services.AddTransient<AdminDiscountsPage>();
+		builder.Services.AddTransient<AdminActivityPage>();
 
 #if DEBUG
 		builder.Logging.AddDebug();

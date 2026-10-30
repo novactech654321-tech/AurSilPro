@@ -12,7 +12,8 @@ namespace AurSil.Api.Controllers;
 // payments are only credited after the Razorpay signature is verified on the server.
 [ApiController]
 [Route("pay")]
-public class PaymentPageController(IConfiguration config, OrderService orders, RazorpayService razorpay) : ControllerBase
+public class PaymentPageController(IConfiguration config, OrderService orders, RazorpayService razorpay,
+    ActivityService activity) : ControllerBase
 {
     private readonly string _connectionString = config.GetConnectionString("Aursil")!;
 
@@ -96,7 +97,10 @@ public class PaymentPageController(IConfiguration config, OrderService orders, R
         if (order is null || order.GatewayOrderId != req.RazorpayOrderId)
             return BadRequest(new ApiMessage("Order mismatch."));
         if (!razorpay.VerifySignature(req.RazorpayOrderId, req.RazorpayPaymentId, req.RazorpaySignature))
+        {
+            await activity.LogAsync(order.UserId, Activity.PaymentFailed, $"{orderNo}: invalid Razorpay signature");
             return BadRequest(new ApiMessage("Payment signature is invalid."));
+        }
 
         await orders.CompleteBuyAsync(orderNo, "razorpay", req.RazorpayPaymentId);
         return Ok(new ApiMessage("Payment verified."));
@@ -115,8 +119,12 @@ public class PaymentPageController(IConfiguration config, OrderService orders, R
     }
 
     [HttpGet("result")]
-    public IActionResult Result(string status, string orderNo)
+    public async Task<IActionResult> Result(string status, string orderNo)
     {
+        if (status != "success" && await orders.GetAsync(orderNo) is { Status: "Created" } order)
+            await activity.LogAsync(order.UserId, status == "cancelled" ? Activity.PaymentCancelled : Activity.PaymentFailed,
+                $"{orderNo}: {order.Grams:0.####} g {Metals.Display(order.Metal)}, {OrderService.Inr(order.Total)}");
+
         var (icon, title) = status switch
         {
             "success" => ("✅", "Payment successful"),
